@@ -60,7 +60,7 @@ eureka:
 
 
 #不走校验的连接
-#mobilenocheckurl: /mobile/user/login,/mobile/user/register,/mobile/user/saveUserHead
+mobilenocheckurl: /mobile/user/login,/mobile/user/register,/mobile/user/saveUserHead
 
 #前端路径
 webpageurl: http://localhost:8320

@@ -14,6 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * Created by qinziqing on 2017/10 /23.
+ */
 public class Generator {
 
 
