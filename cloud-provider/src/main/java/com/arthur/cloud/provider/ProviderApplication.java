@@ -7,7 +7,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@MapperScan("com.hichat.provider.mapper")
+@MapperScan("com.arthur.cloud.provider.mapper")
 public class ProviderApplication {
 
     public static void main(String[] args) {

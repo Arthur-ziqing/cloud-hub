@@ -1,6 +1,8 @@
 package com.arthur.cloud.provider.controller;
 
 import com.arthur.cloud.common.util.ReturnResult;
+import com.arthur.cloud.provider.service.HelloService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,8 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("hello")
 public class HelloController {
 
+    @Autowired
+    private HelloService helloService;
+
+
     @PostMapping("saveHello")
     public ReturnResult save(){
-        return ReturnResult.ok("aaa");
+        return ReturnResult.ok(helloService.testSelect());
     }
 }
