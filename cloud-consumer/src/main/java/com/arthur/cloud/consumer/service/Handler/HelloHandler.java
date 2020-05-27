@@ -17,6 +17,6 @@ public class HelloHandler implements HelloService {
 
     @Override
     public ReturnResult saveHello() {
-        return ReturnResult.build(400,"系统异常","aaa");
+        return ReturnResult.build(400,"系统异常");
     }
 }

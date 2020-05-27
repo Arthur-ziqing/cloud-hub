@@ -1,5 +1,6 @@
 package com.arthur.cloud.provider.controller;
 
+import com.arthur.cloud.common.util.ReturnResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class HelloController {
 
     @PostMapping("saveHello")
-    public String save(){
-        return "aaa";
+    public ReturnResult save(){
+        return ReturnResult.ok("aaa");
     }
 }

@@ -26,7 +26,7 @@ public class HelloController {
         return "hello："+id;
     }
 
-    @PostMapping("saveHello")
+    @GetMapping("saveHello")
     public ReturnResult  saveHello(){
        return helloService.saveHello();
     }
