@@ -1,4 +1,4 @@
-package com.arthur.cloud.common.config.redis;
+package com.arthur.cloud.consumer.redis;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -21,19 +21,12 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @Author 秦梓青
- * @ClassName
- * @Description
- * @create 2020-04-01 16:51
- * @Version 1.0
- **/
+
 @Configuration
 @EnableCaching
-public class RedisConnect extends CachingConfigurerSupport {
-
+public class RedisConfig extends CachingConfigurerSupport {
     @Autowired
-    private RedisConfig redisConfig;
+    private RedisConn redisConn;
 
     /**
      * 生产key的策略
@@ -88,9 +81,9 @@ public class RedisConnect extends CachingConfigurerSupport {
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
         JedisConnectionFactory factory = new JedisConnectionFactory();
-        factory.setHostName(redisConfig.getHost());
-        factory.setPort(redisConfig.getPort());
-        factory.setPassword(redisConfig.getPassword());
+        factory.setHostName(redisConn.getHost());
+        factory.setPort(redisConn.getPort());
+        factory.setPassword(redisConn.getPassword());
         return factory;
     }
 
@@ -113,6 +106,5 @@ public class RedisConnect extends CachingConfigurerSupport {
         template.afterPropertiesSet();
         return template;
     }
-
 
 }

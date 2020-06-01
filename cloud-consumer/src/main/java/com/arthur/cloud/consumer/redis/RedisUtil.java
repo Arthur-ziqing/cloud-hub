@@ -1,4 +1,4 @@
-package com.arthur.cloud.common.util;
+package com.arthur.cloud.consumer.redis;
 
 
 import org.springframework.beans.factory.annotation.Autowired;

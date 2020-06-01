@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
  **/
 
 @RestController
-@RequestMapping("/demo")
+@RequestMapping("/mobile/demo")
 public class HelloController {
 
     @Autowired
