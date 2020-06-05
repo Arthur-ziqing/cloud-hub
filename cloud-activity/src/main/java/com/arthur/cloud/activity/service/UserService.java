@@ -1,6 +1,6 @@
 package com.arthur.cloud.activity.service;
 
-import com.arthur.cloud.activity.model.Users;
+import com.arthur.cloud.activity.model.User;
 import org.springframework.stereotype.Service;
 
 /**
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
  * @Version 1.0
  **/
 @Service
-public class UsersService extends BaseService<Users>{
+public class UserService extends BaseService<User>{
 
 
 }

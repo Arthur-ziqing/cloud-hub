@@ -9,11 +9,11 @@ import lombok.Data;
  * @author 
  */
 @Data
-public class Users implements Serializable {
+public class User implements Serializable {
     /**
      * 微信openid
      */
-    private String openid;
+    private String openId;
 
     /**
      * 昵称

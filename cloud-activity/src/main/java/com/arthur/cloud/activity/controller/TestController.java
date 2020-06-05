@@ -1,6 +1,6 @@
 package com.arthur.cloud.activity.controller;
 
-import com.arthur.cloud.activity.service.UsersService;
+import com.arthur.cloud.activity.service.UserService;
 import com.arthur.cloud.activity.utils.CommonResult;
 
 
@@ -23,7 +23,7 @@ public class TestController {
 
 
     @Resource
-    private UsersService usersService;
+    private UserService usersService;
 
     @GetMapping("/test")
     public String test(){
