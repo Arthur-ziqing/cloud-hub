@@ -27,7 +27,7 @@
         <javaClientGenerator targetPackage="com.arthur.cloud.activity.mapper" targetProject="src/main/java"
                              type="XMLMAPPER"/>
 
-        <table tableName="test_g">
+        <table tableName="user">
             <!--mysql 配置-->
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
             <!--oracle 配置-->

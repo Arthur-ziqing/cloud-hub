@@ -2,18 +2,19 @@ package com.arthur.cloud.activity.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.arthur.cloud.activity.config.AppContext;
 import com.arthur.cloud.activity.model.User;
 import com.arthur.cloud.activity.utils.HttpRequestUtils;
 import com.arthur.cloud.activity.utils.WeChatAuthProperties;
 import com.arthur.cloud.activity.utils.WechatAccessUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -30,7 +31,7 @@ public class WeChatService {
 
     private static final Logger logger = LoggerFactory.getLogger(WeChatService.class);
 
-    @Autowired
+    @Resource
     private UserService userService;
 
     /**
@@ -40,11 +41,9 @@ public class WeChatService {
 
     private RestTemplate wxAuthRestTemplate = new RestTemplate();
 
-    @Autowired
+    @Resource
     private WeChatAuthProperties wechatAuthProperties;
 
-    @Autowired
-    private StringRedisTemplate stringRedisTemplate;
 
 
     /**
@@ -88,28 +87,14 @@ public class WeChatService {
     }
 
 
-    public String create3rdSession(String wxOpenId, String wxSessionKey, Long expires) {
-        String thirdSessionKey = WechatAccessUtils.getRandomString(64);
-        StringBuffer sb = new StringBuffer();
-        sb.append(wxSessionKey).append("#").append(wxOpenId);
-
-        stringRedisTemplate.opsForValue().set(thirdSessionKey, sb.toString(), expires, TimeUnit.SECONDS);
-        return thirdSessionKey;
-    }
-
-
+    /**
+     * 更新用户信息
+     * @param user 用户信息
+     */
     public void updateUserInfo(User user){
-        User userExist = userService.queryByID(AppContext.getCurrentUserWechatOpenId());
-        userExist.setAddress(1L);
-        userExist.setUpdatedAt(System.currentTimeMillis());
-        userExist.setGender(consumer.getGender());
-        userExist.setAvatarUrl(consumer.getAvatarUrl());
-        userExist.setWechatOpenid(consumer.getWechatOpenid());
-        userExist.setEmail(consumer.getEmail());
-        userExist.setNickname(consumer.getNickname());
-        userExist.setPhone(consumer.getPhone());
-        userExist.setUsername(consumer.getUsername());
-        consumerMapper.updateConsumer(consumerExist);
+        User userExist = userService.queryByID(user.getOpenId());
+        BeanUtils.copyProperties(user,userExist);
+        userService.updateByID(userExist);
     }
 
 

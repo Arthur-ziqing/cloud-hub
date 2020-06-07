@@ -1,6 +1,5 @@
 package com.arthur.cloud.activity.controller;
 
-import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSONObject;
 import com.arthur.cloud.activity.model.User;
 import com.arthur.cloud.activity.service.UserService;
@@ -45,14 +44,12 @@ public class WebController {
     @ResponseBody
     public Map<String, Object> miniLogin(String code) {
         JSONObject jsonObject = weChatService.getWxSession(code);
-
-
         return null;
     }
 
     @PostMapping("/updateUserInfo")
-    public void updateUserInfo(@RequestBody User consumer) {
-        weChatService.(consumer);
+    public void updateUserInfo(@RequestBody User user) {
+        weChatService.updateUserInfo(user);
     }
 
     @Resource

@@ -1,18 +1,17 @@
 package com.arthur.cloud.activity.model;
 
-import java.io.Serializable;
-import java.util.Date;
 import lombok.Data;
 
-/**
- * users
- * @author 
- */
+import java.io.Serializable;
+import java.util.Date;
+import javax.persistence.*;
+
 @Data
-public class User implements Serializable {
-    /**
-     * 微信openid
-     */
+public class User  implements Serializable {
+
+    private static final long serialVersionUID = -4900248123286980845L;
+
+    @Column(name = "openId")
     private String openId;
 
     /**
@@ -21,39 +20,46 @@ public class User implements Serializable {
     private String nickname;
 
     /**
-     * 签名
+     * 用户头像
      */
-    private String sign;
+    @Column(name = "avatarUrl")
+    private String avatarUrl;
 
     /**
-     * 性别 0 女; 1 男；
+     * 用户性别；0：未知；1：男；2：女；
      */
-    private Boolean gender;
+    private Integer gender;
 
     /**
-     * 所在地
+     * 用户所在国家
      */
-    private String address;
+    private String country;
 
     /**
-     * 学校
+     * 用户所在省份
      */
-    private String school;
+    private String province;
 
     /**
-     * 行业
+     * 用户所在城市
      */
-    private String profession;
+    private String city;
+
+    /**
+     * 语言
+     */
+    private String language;
 
     /**
      * 创建时间
      */
+    @Column(name = "createTime")
     private Date createtime;
 
     /**
      * 更新时间
      */
+    @Column(name = "updateTime")
     private Date updatetime;
 
-    private static final long serialVersionUID = 1L;
 }
