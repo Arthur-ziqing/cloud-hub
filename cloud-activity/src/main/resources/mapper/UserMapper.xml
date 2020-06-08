@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arthur.cloud.activity.mapper.UserMapper">
+  <resultMap id="BaseResultMap" type="com.arthur.cloud.activity.model.User">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <result column="openId" jdbcType="VARCHAR" property="openid" />
+    <result column="nickname" jdbcType="VARCHAR" property="nickname" />
+    <result column="avatarUrl" jdbcType="VARCHAR" property="avatarurl" />
+    <result column="gender" jdbcType="INTEGER" property="gender" />
+    <result column="country" jdbcType="VARCHAR" property="country" />
+    <result column="province" jdbcType="VARCHAR" property="province" />
+    <result column="city" jdbcType="VARCHAR" property="city" />
+    <result column="language" jdbcType="VARCHAR" property="language" />
+    <result column="createTime" jdbcType="TIMESTAMP" property="createtime" />
+    <result column="updateTime" jdbcType="TIMESTAMP" property="updatetime" />
+  </resultMap>
+</mapper>
