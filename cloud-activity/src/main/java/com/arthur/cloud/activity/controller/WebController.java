@@ -53,47 +53,10 @@ public class WebController {
     @Resource
     private RedisTemplate<String, String> redisTemplate;
 
-//    /**
-//     * 小程序授权登录
-//     */
-//    @ApiOperation(value = "登陆校验")
-//    @PostMapping(value = "/login")
-//    @ResponseBody
-//    public Map<String, Object> miniLogin(String code) {
-//        JSONObject jsonObject = weChatService.getWxSession(code);
-//        return null;
-//    }
-
     @PostMapping("/updateUserInfo")
     public void updateUserInfo(@RequestBody User user) {
         weChatService.updateUserInfo(user);
     }
-
-
-//    @ApiOperation(value = "登陆校验")
-//    @PostMapping(value = "login")
-//    public CommonResult login(@RequestBody Map map) {
-//
-//        try {
-//            String openId = map.get("openId");
-//            User users = new User();
-//            users.setOpenId(openId);
-//            User user = userService.queryOne(users);
-//            if (user.getOpenId().equals(openId)) {
-//
-//                userService.update(user);
-//                return new CommonResult(200, "Login success", JWTUtil.sign(openId, user.getNickname()));
-//
-//            } else {
-//
-//                throw new UnauthorizedException();
-//            }
-//
-//        } catch (Exception e) {
-//            return new CommonResult(401, "Login error", null);
-//
-//        }
-//    }
 
 
     @ApiResponses({
