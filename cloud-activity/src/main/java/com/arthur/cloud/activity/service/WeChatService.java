@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -63,7 +64,13 @@ public class WeChatService {
         //默认参数
         requestUrlParam.put("grant_type", wechatAuthProperties.getGrantType());
 
-        JSONObject jsonObject = JSON.parseObject(HttpRequestUtils.sendPost(requestUrl,requestUrlParam));
+        StringBuilder param = new StringBuilder();
+
+        for (String key : requestUrlParam.keySet()) {
+            param.append(key).append("=").append(requestUrlParam.get(key)).append("&");
+        }
+
+        JSONObject jsonObject = JSON.parseObject(HttpRequestUtils.sendGet(requestUrl, param.toString()));
         logger.info("授权返回信息:"+jsonObject.toString());
         return jsonObject;
     }

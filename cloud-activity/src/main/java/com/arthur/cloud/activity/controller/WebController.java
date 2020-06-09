@@ -106,7 +106,8 @@ public class WebController {
     @ApiOperation(value = "小程序登录", httpMethod = "POST", notes = "小程序登录")
     @ResponseBody
     @RequestMapping("/login")
-    public Map<String, Object> doLogin(@ApiParam(required = true, value = "临时登录凭证code", name = "code") String code,
+    public Map<String, Object> doLogin(@ApiParam(required = true, value = "临时登录凭证code", name = "code")
+                                       @RequestParam(value = "code", required = true) String code,
                                        @ApiParam(required = true, value = "用户非敏感信息", name = "rawData")
                                        @RequestParam(value = "rawData", required = true) String rawData,
                                        @ApiParam(required = true, value = "签名", name = "signature")
@@ -133,7 +134,9 @@ public class WebController {
 
         logger.info("openid=" + openid + ",session_key=" + sessionKey);
 
-        User user = userService.queryByID(openid);
+        User u = new User();
+        u.setOpenId(openid);
+        User user = userService.getUser(u);
         //uuid生成唯一key
         String skey = UUID.randomUUID().toString();
         if (user == null) {
@@ -144,7 +147,7 @@ public class WebController {
             String city = rawDataJson.getString("city");
             String country = rawDataJson.getString("country");
             String province = rawDataJson.getString("province");
-
+            String language = rawDataJson.getString("language");
 
             user = new User();
             user.setOpenId(openid);
@@ -158,6 +161,7 @@ public class WebController {
             user.setUpdatetime(new Date());
             user.setSessionKey(sessionKey);
             user.setSkey(skey);
+            user.setLanguage(language);
             userService.insert(user);
         } else {
             //已存在
@@ -187,6 +191,7 @@ public class WebController {
         assert userInfo != null;
         userInfo.put("balance", 0);
         map.put("userInfo", userInfo);
+        map.put("token", JWTUtil.sign(user.getOpenId(), user.getNickname()));
         return map;
     }
 
