@@ -62,4 +62,17 @@ public class User implements Serializable {
     @Column(name = "updateTime")
     private Date updatetime;
 
+    /**
+     * 用户登录态标识
+     */
+    @Column(name = "skey")
+    private String skey;
+
+
+    /**
+     * sessionKey
+     */
+    @Column(name = "sessionKey")
+    private String sessionKey;
+
 }

@@ -65,12 +65,6 @@ public class WeChatService {
 
         JSONObject jsonObject = JSON.parseObject(HttpRequestUtils.sendPost(requestUrl,requestUrlParam));
         logger.info("授权返回信息:"+jsonObject.toString());
-        String openId = jsonObject.getString("oppenid");
-        String unionid = jsonObject.getString("unionid");
-        String sessionKey = jsonObject.getString("session_key");
-        User user = new User();
-        user.setOpenId(openId);
-        loginOrRegisterConsumer(user);
         return jsonObject;
     }
 

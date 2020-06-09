@@ -91,9 +91,9 @@ public class Swagger2Config  extends WebMvcConfigurerAdapter {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("TaorayTaoray")//大标题
+                .title("幸运小活动")//大标题
                 .version("1.0")//版本
-                .contact(new Contact("日播开发团队", null,null))//作者
+                .contact(new Contact("惊叹号开发团队", null,null))//作者
                 .build();
     }
 

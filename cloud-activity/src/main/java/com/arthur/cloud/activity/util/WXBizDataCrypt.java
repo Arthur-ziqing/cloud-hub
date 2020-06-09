@@ -1,6 +1,11 @@
 package com.arthur.cloud.activity.util;
 
-import org.apache.commons.codec.binary.Base64;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import org.apache.shiro.codec.Base64;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -9,10 +14,9 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.AlgorithmParameterSpec;
+import java.security.*;
+import java.security.spec.InvalidParameterSpecException;
+import java.util.Arrays;
 
 /**
  * @Author 秦梓青
@@ -23,43 +27,52 @@ import java.security.spec.AlgorithmParameterSpec;
  **/
 public class WXBizDataCrypt {
 
+
+    private static final Logger log = LoggerFactory.getLogger(WXBizDataCrypt.class);
+
     /**
      * AES解密
      *
-     * @param data   //密文，被加密的数据
-     * @param key    //秘钥
+     * @param encryptedData   //密文，被加密的数据
+     * @param sessionKey    //秘钥
      * @param iv     //偏移量
      * @return
      * @throws Exception
      */
-    public static String decrypt1(String data, String key,String iv){
-        //被加密的数据
-        byte[] dataByte = Base64.decodeBase64(data);
-        //加密秘钥
-        byte[] keyByte = Base64.decodeBase64(key);
-        //偏移量
-        byte[] ivByte = Base64.decodeBase64(iv);
+    public static JSONObject decrypt1(String encryptedData, String sessionKey, String iv){
+        // 被加密的数据
+        byte[] dataByte = Base64.decode(encryptedData);
+        // 加密秘钥
+        byte[] keyByte = Base64.decode(sessionKey);
+        // 偏移量
+        byte[] ivByte = Base64.decode(iv);
         try {
-            AlgorithmParameterSpec ivSpec = new IvParameterSpec(ivByte);
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            SecretKeySpec keySpec = new SecretKeySpec(keyByte, "AES");
-            cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
-            return new String(cipher.doFinal(dataByte),"UTF-8");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (InvalidAlgorithmParameterException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            // 如果密钥不足16位，那么就补足.  这个if 中的内容很重要
+            int base = 16;
+            if (keyByte.length % base != 0) {
+                int groups = keyByte.length / base + (keyByte.length % base != 0 ? 1 : 0);
+                byte[] temp = new byte[groups * base];
+                Arrays.fill(temp, (byte) 0);
+                System.arraycopy(keyByte, 0, temp, 0, keyByte.length);
+                keyByte = temp;
+            }
+            // 初始化
+            Security.addProvider(new BouncyCastleProvider());
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding","BC");
+            SecretKeySpec spec = new SecretKeySpec(keyByte, "AES");
+            AlgorithmParameters parameters = AlgorithmParameters.getInstance("AES");
+            parameters.init(new IvParameterSpec(ivByte));
+            // 初始化
+            cipher.init( Cipher.DECRYPT_MODE, spec, parameters);
+            byte[] resultByte = cipher.doFinal(dataByte);
+            if (null != resultByte && resultByte.length > 0) {
+                String result = new String(resultByte, "UTF-8");
+                return JSON.parseObject(result);
+            }
+        } catch (NoSuchAlgorithmException | InvalidParameterSpecException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | UnsupportedEncodingException | InvalidKeyException | InvalidAlgorithmParameterException | NoSuchProviderException e) {
+            log.error(e.getMessage(), e);
         }
         return null;
+
     }
 }

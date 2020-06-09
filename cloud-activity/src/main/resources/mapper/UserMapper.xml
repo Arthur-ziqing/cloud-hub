@@ -15,5 +15,7 @@
     <result column="language" jdbcType="VARCHAR" property="language" />
     <result column="createTime" jdbcType="TIMESTAMP" property="createtime" />
     <result column="updateTime" jdbcType="TIMESTAMP" property="updatetime" />
+    <result column="skey" jdbcType="VARCHAR" property="skey" />
+    <result column="sessionKey" jdbcType="VARCHAR" property="sessionKey" />
   </resultMap>
 </mapper>
