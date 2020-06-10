@@ -5,9 +5,9 @@
     <!--
       WARNING - @mbg.generated
     -->
-    <result column="openId" jdbcType="VARCHAR" property="openid" />
+    <result column="openId" jdbcType="VARCHAR" property="openId" />
     <result column="nickname" jdbcType="VARCHAR" property="nickname" />
-    <result column="avatarUrl" jdbcType="VARCHAR" property="avatarurl" />
+    <result column="avatarUrl" jdbcType="VARCHAR" property="avatarUrl" />
     <result column="gender" jdbcType="INTEGER" property="gender" />
     <result column="country" jdbcType="VARCHAR" property="country" />
     <result column="province" jdbcType="VARCHAR" property="province" />
