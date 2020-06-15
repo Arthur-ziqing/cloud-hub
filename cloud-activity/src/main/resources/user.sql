@@ -30,10 +30,10 @@ CREATE TABLE `user`  (
   `province` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `city` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `language` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  `createtime` datetime(0) NULL DEFAULT NULL,
-  `updatetime` datetime(0) NULL DEFAULT NULL,
   `skey` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `sessionKey` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `createtime` datetime(0) NULL DEFAULT NULL,
+  `updatetime` datetime(0) NULL DEFAULT NULL,
   PRIMARY KEY (`openId`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
 
