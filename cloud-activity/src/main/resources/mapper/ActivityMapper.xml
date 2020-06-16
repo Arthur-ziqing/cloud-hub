@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arthur.cloud.activity.mapper.ActivityMapper">
+  <resultMap id="BaseResultMap" type="com.arthur.cloud.activity.model.Activity">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <result column="id" jdbcType="BIGINT" property="id" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="coverImages" jdbcType="VARCHAR" property="coverImages" />
+    <result column="images" jdbcType="VARCHAR" property="images" />
+    <result column="shareImage" jdbcType="VARCHAR" property="shareImage" />
+    <result column="joinCount" jdbcType="INTEGER" property="joinCount" />
+    <result column="brandId" jdbcType="BIGINT" property="brandId" />
+    <result column="openTime" jdbcType="TIMESTAMP" property="openTime" />
+    <result column="luckyPrizeNum" jdbcType="BIGINT" property="luckyPrizeNum" />
+    <result column="luckyNumber" jdbcType="BIGINT" property="luckyNumber" />
+    <result column="luckyPrizeName" jdbcType="VARCHAR" property="luckyPrizeName" />
+    <result column="createTime" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="creator" jdbcType="VARCHAR" property="creator" />
+    <result column="updateTime" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="updater" jdbcType="VARCHAR" property="updater" />
+  </resultMap>
+</mapper>

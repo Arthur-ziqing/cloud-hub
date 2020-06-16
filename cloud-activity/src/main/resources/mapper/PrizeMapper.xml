@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arthur.cloud.activity.mapper.PrizeMapper">
+  <resultMap id="BaseResultMap" type="com.arthur.cloud.activity.model.Prize">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <result column="id" jdbcType="BIGINT" property="id" />
+    <result column="artivityId" jdbcType="BIGINT" property="artivityId" />
+    <result column="levelName" jdbcType="VARCHAR" property="levelName" />
+    <result column="levelPrize" jdbcType="VARCHAR" property="levelPrize" />
+    <result column="inviteName" jdbcType="VARCHAR" property="inviteName" />
+    <result column="invitePrize" jdbcType="VARCHAR" property="invitePrize" />
+    <result column="num" jdbcType="BIGINT" property="num" />
+  </resultMap>
+</mapper>

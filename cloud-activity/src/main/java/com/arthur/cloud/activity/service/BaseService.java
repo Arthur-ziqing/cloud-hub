@@ -51,14 +51,7 @@ public abstract class BaseService<T> {
     	return mapper.selectAll();
     }
 
-    public PageAjax<T> queryPage(PageAjax<T> page, T entity){
-        PageMethod.startPage(page.getPageNo(), page.getPageSize());
-        List<T> list = queryList(entity);
-        return new PageAjax<T>(list);
-    }
-
     public PageInfo<T> queryByPage(PageAjax<T> page){
-
         PageHelper.startPage(page.getPageNo(), page.getPageSize());
         List<T> list = mapper.selectAll();
         return new PageInfo<T>(list);

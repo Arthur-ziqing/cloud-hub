@@ -2,7 +2,6 @@ package com.arthur.cloud.activity.controller;
 
 import com.arthur.cloud.activity.service.UserService;
 import com.arthur.cloud.activity.util.CommonResult;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,6 +27,7 @@ public class TestController {
 
     @GetMapping("/test")
     public String test(){
+
         return "test failed";
     }
 

@@ -60,25 +60,6 @@ public class AppUtil {
 	}
 
 	/**
-	 * 封装分页查询返回
-	 * @param result
-	 * @param list
-	 * @return
-	 */
-	public static <T> AjaxResult returnPage(String result, List<T> list) {
-		return returnObj(result, new PageAjax<T>(list));
-	}
-	
-	/**
-	 * 封装分页查询返回
-	 * @param list
-	 * @return
-	 */
-	public static <T> PageAjax<T> returnPage(List<T> list){
-		return new PageAjax<T>(list);
-	}
-
-	/**
 	 * 比较两个实体类属性值是否相等
 	 * @param source
 	 * @param target
