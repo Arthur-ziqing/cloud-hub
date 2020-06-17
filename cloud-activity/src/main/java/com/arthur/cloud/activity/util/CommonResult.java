@@ -8,17 +8,10 @@ package com.arthur.cloud.activity.util;
  */
 public class CommonResult {
 
-    private int code = 1;
-    private boolean hasError;
+    private boolean hasError = false;
 
     private String msg = "操作成功";
     private Object data;
-
-    public CommonResult(int code, String msg, Object data) {
-        this.code = code;
-        this.msg = msg;
-        this.data = data;
-    }
 
     public CommonResult(boolean hasError, String msg, Object data) {
         this.hasError = hasError;
@@ -26,8 +19,8 @@ public class CommonResult {
         this.data = data;
     }
 
-    public CommonResult(int code, String msg) {
-        this.code = code;
+    public CommonResult(boolean hasError, String msg) {
+        this.hasError = hasError;
         this.msg = msg;
     }
 
@@ -36,27 +29,18 @@ public class CommonResult {
         this.data = data;
     }
 
-    public CommonResult(int code) {
-        this.code = code;
+    public CommonResult(boolean hasError) {
+        this.hasError = hasError;
         this.msg = "操作失败";
     }
 
     public CommonResult(String msg) {
-        this.code = 0;
+        this.hasError = true;
         this.msg = msg;
     }
 
     public CommonResult() {
     }
-
-    public int getRetcode() {
-        return code;
-    }
-
-    public void setRetcode(int code) {
-        this.code = code;
-    }
-
     public String getRetmsg() {
         return msg;
     }
@@ -73,11 +57,18 @@ public class CommonResult {
         this.data = data;
     }
 
+    public boolean isHasError() {
+        return hasError;
+    }
+
+    public void setHasError(boolean hasError) {
+        this.hasError = hasError;
+    }
+
     @Override
     public String toString() {
         return "CommonResult{" +
-                "code=" + code +
-                ", hasError=" + hasError +
+                "hasError=" + hasError +
                 ", msg='" + msg + '\'' +
                 ", data=" + data +
                 '}';

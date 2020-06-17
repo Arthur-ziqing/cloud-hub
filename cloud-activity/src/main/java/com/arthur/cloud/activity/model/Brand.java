@@ -1,5 +1,6 @@
 package com.arthur.cloud.activity.model;
 
+import io.swagger.annotations.ApiModel;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -12,8 +13,10 @@ import javax.persistence.*;
 @Data
 public class Brand implements Serializable {
 
+    private static final long serialVersionUID = 1987129393259342745L;
+
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     /**
      * 品牌名称

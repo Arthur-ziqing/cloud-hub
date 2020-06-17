@@ -1,14 +1,14 @@
 package com.arthur.cloud.activity.service;
 
+import com.arthur.cloud.activity.util.CommonResult;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.github.pagehelper.page.PageMethod;
-import com.arthur.cloud.activity.util.AjaxResult;
 import com.arthur.cloud.activity.util.AppUtil;
 import com.arthur.cloud.activity.util.PageAjax;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
+import tk.mybatis.mapper.common.MySqlMapper;
 
 import java.util.List;
 
@@ -21,6 +21,9 @@ public abstract class BaseService<T> {
 
     @Autowired
     protected Mapper<T> mapper;
+
+    @Autowired
+    protected MySqlMapper<T> mySqlMapper;
 
     public Mapper<T> getMapper() {
 
@@ -52,13 +55,12 @@ public abstract class BaseService<T> {
     }
 
     public PageInfo<T> queryByPage(PageAjax<T> page){
-        PageHelper.startPage(page.getPageNo(), page.getPageSize());
+        PageHelper.startPage(page.getStart(), page.getLimit());
         List<T> list = mapper.selectAll();
         return new PageInfo<T>(list);
     }
 
-    public AjaxResult save(T entity) {
-
+    public CommonResult save(T entity) {
         int ret = insert(entity);
         String result = null;
         if(ret <= 0){
@@ -71,7 +73,7 @@ public abstract class BaseService<T> {
     	return mapper.insert(entity);
     }
 
-    public AjaxResult saveNotNull(T entity) {
+    public CommonResult saveNotNull(T entity) {
     	int ret = mapper.insertSelective(entity);
         String result = null;
         if(ret <= 0){
@@ -80,7 +82,7 @@ public abstract class BaseService<T> {
     	return AppUtil.returnObj(result);
     }
 
-    public AjaxResult update(T entity) {
+    public CommonResult update(T entity) {
     	int ret = updateByID(entity);
         String result = null;
         if(ret <= 0){
@@ -94,7 +96,7 @@ public abstract class BaseService<T> {
     }
 
 
-    public AjaxResult delete(Object key) {
+    public CommonResult delete(Object key) {
         int ret = deleteByID(key);
         String result = null;
         if(ret <= 0){
@@ -107,5 +109,17 @@ public abstract class BaseService<T> {
     	return mapper.deleteByPrimaryKey(key);
     }
 
+    public int insertList(List<T> list){
+        return mySqlMapper.insertList(list);
+    }
+
+    public CommonResult saveList(List<T> list) {
+        int ret = insertList(list);
+        String result = null;
+        if(ret <= 0){
+            result = "添加失败";
+        }
+        return AppUtil.returnObj(result);
+    }
 
 }

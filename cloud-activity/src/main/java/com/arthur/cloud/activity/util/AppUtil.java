@@ -25,11 +25,11 @@ public class AppUtil {
 	 * @param result
 	 * @return
 	 */
-	public static AjaxResult returnObj(String result) {
+	public static CommonResult returnObj(String result) {
 		if (StringUtils.isEmpty(result)) {
-			return new AjaxResult();
+			return new CommonResult();
 		}
-		return new AjaxResult(result);
+		return new CommonResult(result);
 	}
 
 	/**
@@ -38,11 +38,11 @@ public class AppUtil {
 	 * @param data
 	 * @return
 	 */
-	public static AjaxResult returnObj(String result, Object data) {
+	public static CommonResult returnObj(String result, Object data) {
 		if (StringUtils.isEmpty(result)) {
-			return new AjaxResult(data);
+			return new CommonResult(data);
 		}
-		return new AjaxResult(result);
+		return new CommonResult(result);
 	}
 
 	/**
@@ -51,12 +51,12 @@ public class AppUtil {
 	 * @param
 	 * @return
 	 */
-	public static <T> AjaxResult returnList(String result, List<T> list) {
+	public static <T> CommonResult returnList(String result, List<T> list) {
 		if (StringUtils.isEmpty(result)) {
 			return returnObj(result, list);
 		}
 		list = new ArrayList<T>();
-		return new AjaxResult(0, result, list);
+		return new CommonResult(true, result, list);
 	}
 
 	/**
@@ -137,6 +137,7 @@ public class AppUtil {
 			case 2:
 				sb.append(String.valueOf(new Random().nextInt(10)));
 				break;
+				default:
 			}
 		}
 		return sb.toString();

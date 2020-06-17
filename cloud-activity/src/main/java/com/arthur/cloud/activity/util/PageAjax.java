@@ -19,14 +19,14 @@ public class PageAjax<T> implements Serializable {
     /**
      * 当前页
      */
-    private int pageNo = 0;
+    private int start = 0;
 
     /**
      * 每页的数量
      */
-    private int pageSize = 10;
+    private int limit = 10;
 
     private List<T> list;
 
-    private int total;
+    private long total;
 }

@@ -2,11 +2,20 @@ package com.arthur.cloud.activity.model;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.*;
 
+/**
+ * @author 秦梓青
+ */
 @Data
-public class Activity {
+@Table(name = "activity")
+public class Activity implements Serializable {
+
+    private static final long serialVersionUID = 4398103412098229973L;
+
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

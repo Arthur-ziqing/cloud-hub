@@ -6,11 +6,16 @@
       WARNING - @mbg.generated
     -->
     <result column="id" jdbcType="BIGINT" property="id" />
-    <result column="artivityId" jdbcType="BIGINT" property="artivityId" />
+    <result column="activityId" jdbcType="BIGINT" property="activityId" />
     <result column="levelName" jdbcType="VARCHAR" property="levelName" />
     <result column="levelPrize" jdbcType="VARCHAR" property="levelPrize" />
     <result column="inviteName" jdbcType="VARCHAR" property="inviteName" />
     <result column="invitePrize" jdbcType="VARCHAR" property="invitePrize" />
     <result column="num" jdbcType="BIGINT" property="num" />
   </resultMap>
+
+  <delete id="deleteByActivityId">
+    delete from prize where activityId = #{activityId}
+  </delete>
+
 </mapper>

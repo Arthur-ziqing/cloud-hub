@@ -170,10 +170,10 @@ public class WebController {
 
             User users = JWTUtil.getToken(request);
             users = userService.queryOne(users);
-            return new CommonResult(200, "Login success", users);
+            return new CommonResult(false, "Login success", users);
         } catch (Exception e) {
 
-            return new CommonResult(401, "Login error", null);
+            return new CommonResult(true, "Login error", null);
         }
 
     }
@@ -203,9 +203,9 @@ public class WebController {
             if (user.getOpenId() != null) {
                 user = userService.queryOne(user);
                 if (user == null) {
-                    return new CommonResult(401, "Login error", openId);
+                    return new CommonResult(true, "Login error", openId);
                 } else {
-                    return new CommonResult(200, "Login success", JWTUtil.sign(user.getOpenId(), user.getNickname()));
+                    return new CommonResult(false, "Login success", JWTUtil.sign(user.getOpenId(), user.getNickname()));
                 }
             }
         } catch (Exception e) {
@@ -221,16 +221,16 @@ public class WebController {
 
         Subject subject = SecurityUtils.getSubject();
         if (subject.isAuthenticated()) {
-            return new CommonResult(200, "You are already logged in", null);
+            return new CommonResult(false, "You are already logged in", null);
         } else {
-            return new CommonResult(200, "You are guest", null);
+            return new CommonResult(false, "You are guest", null);
         }
     }
 
     @GetMapping("getToken")
     public CommonResult getToken() {
 
-        return new CommonResult(200, "You are guest", WechatAccessUtils.getToken());
+        return new CommonResult(false, "You are guest", WechatAccessUtils.getToken());
 
     }
 
@@ -238,28 +238,28 @@ public class WebController {
     @RequiresAuthentication
     public CommonResult requireAuth() {
 
-        return new CommonResult(200, "You are authenticated", null);
+        return new CommonResult(false, "You are authenticated", null);
     }
 
     @GetMapping("/require_role")
     @RequiresRoles("admin")
     public CommonResult requireRole() {
 
-        return new CommonResult(200, "You are visiting require_role", null);
+        return new CommonResult(false, "You are visiting require_role", null);
     }
 
     @GetMapping("/require_permission")
     @RequiresPermissions(logical = Logical.AND, value = {"view", "edit"})
     public CommonResult requirePermission() {
 
-        return new CommonResult(200, "You are visiting permission require edit,view", null);
+        return new CommonResult(false, "You are visiting permission require edit,view", null);
     }
 
-    @RequestMapping(path = "/401")
+    @RequestMapping(path = "/true")
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public CommonResult unauthorized() {
 
-        return new CommonResult(401, "Unauthorized", null);
+        return new CommonResult(true, "Unauthorized", null);
     }
 
 }

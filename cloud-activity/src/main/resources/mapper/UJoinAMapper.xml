@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arthur.cloud.activity.mapper.UJoinAMapper">
+  <resultMap id="BaseResultMap" type="com.arthur.cloud.activity.model.UJoinA">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <result column="openid" jdbcType="VARCHAR" property="openid" />
+    <result column="activityId" jdbcType="BIGINT" property="activityId" />
+    <result column="number" jdbcType="BIGINT" property="number" />
+  </resultMap>
+</mapper>

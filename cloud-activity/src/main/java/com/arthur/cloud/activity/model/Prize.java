@@ -3,20 +3,22 @@ package com.arthur.cloud.activity.model;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * @author 秦梓青
  */
 @Data
-public class Prize {
+public class Prize implements Serializable {
+    private static final long serialVersionUID = 8891212091376227568L;
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /**
      * 活动id
      */
-    @Column(name = "artivityId")
-    private Long artivityId;
+    @Column(name = "activityId")
+    private Long activityId;
 
     /**
      * 等级名称
