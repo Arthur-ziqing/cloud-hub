@@ -26,11 +26,11 @@ public class JWTUtil {
      * @param secret 用户的密码
      * @return 是否正确
      */
-    public static boolean verify(String token, String username, String secret) {
+    public static boolean verify(String token, String openId, String secret) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             JWTVerifier verifier = JWT.require(algorithm)
-                    .withClaim("username", username)
+                    .withClaim("openId", openId)
                     .build();
             DecodedJWT jwt = verifier.verify(token);
             return true;
@@ -48,7 +48,7 @@ public class JWTUtil {
     public static String getUsername(String token) {
         try {
             DecodedJWT jwt = JWT.decode(token);
-            return jwt.getClaim("username").asString();
+            return jwt.getClaim("openId").asString();
         } catch (JWTDecodeException e) {
             return null;
         }
@@ -58,18 +58,18 @@ public class JWTUtil {
     /**
      * 生成签名,5min后过期
      *
-     * @param telOrEmail
-     * @param secret     用户的密码
+     * @param openId  openId
+     * @param nickName     用户昵称
      * @return 加密的token
      */
-    public static String sign(String telOrEmail, String secret) {
+    public static String sign(String openId, String nickName) {
 
         try {
             Date date = new Date(System.currentTimeMillis() + EXPIRE_TIME);
-            Algorithm algorithm = Algorithm.HMAC256(secret);
+            Algorithm algorithm = Algorithm.HMAC256(nickName);
             // 附带username信息
             return JWT.create()
-                    .withClaim("telOrEmail", telOrEmail)
+                    .withClaim("openId", openId)
                     .withExpiresAt(date)
                     .sign(algorithm);
         } catch (UnsupportedEncodingException e) {
@@ -95,4 +95,7 @@ public class JWTUtil {
         return users;
     }
 
+    public static void main(String[] args) {
+        System.out.println(sign("1234","qzq"));
+    }
 }

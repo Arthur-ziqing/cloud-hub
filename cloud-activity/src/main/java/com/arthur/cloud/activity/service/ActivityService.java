@@ -2,19 +2,31 @@ package com.arthur.cloud.activity.service;
 
 import com.arthur.cloud.activity.mapper.ActivityMapper;
 import com.arthur.cloud.activity.mapper.PrizeMapper;
+import com.arthur.cloud.activity.mapper.UJoinAMapper;
 import com.arthur.cloud.activity.model.Activity;
 import com.arthur.cloud.activity.model.Prize;
+import com.arthur.cloud.activity.model.UJoinA;
+import com.arthur.cloud.activity.model.condition.UserActivityCondition;
+import com.arthur.cloud.activity.model.enums.ActivityEnums;
+import com.arthur.cloud.activity.model.enums.UserActivityEnum;
 import com.arthur.cloud.activity.model.vo.ActivityVo;
 import com.arthur.cloud.activity.model.vo.PrizeVo;
+import com.arthur.cloud.activity.model.vo.UserActivityVo;
+import com.arthur.cloud.activity.util.PageAjax;
+import org.apache.ibatis.session.RowBounds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @Author 秦梓青
@@ -34,6 +46,9 @@ public class ActivityService extends BaseService<Activity> {
 
     @Resource
     private PrizeMapper prizeMapper;
+
+    @Resource
+    private UJoinAMapper uJoinAMapper;
 
 
     public void saveOrUpdate(ActivityVo vo) {
@@ -55,12 +70,12 @@ public class ActivityService extends BaseService<Activity> {
             });
         } else {
             activityMapper.updateByPrimaryKeySelective(activity);
-            prizeVos.forEach(item->{
+            prizeVos.forEach(item -> {
                 Prize prize = new Prize();
                 BeanUtils.copyProperties(item, prize);
-                if (item.isDeleted()){
+                if (item.isDeleted()) {
                     prizeMapper.delete(prize);
-                }else {
+                } else {
                     prizeMapper.updateByPrimaryKeySelective(prize);
                 }
             });
@@ -68,9 +83,87 @@ public class ActivityService extends BaseService<Activity> {
     }
 
 
-    public void delete(Long id){
+    public void delete(Long id) {
         activityMapper.deleteByPrimaryKey(id);
         prizeMapper.deleteByActivityId(id);
+    }
+
+
+    public PageAjax<UserActivityVo> queryPageByType(UserActivityCondition condition, String openId) {
+        PageAjax<UserActivityVo> pageAjax = new PageAjax<>();
+        PageAjax<Activity> list;
+        if (!UserActivityEnum.JOIN.equals(condition.getType())) {
+            list = queryNoJoin(condition);
+        }else {
+            list = queryJoin(condition,openId);
+        }
+        List<UserActivityVo> userActivityVos = new ArrayList<>();
+        BeanUtils.copyProperties(list,pageAjax);
+        list.getList().forEach(item -> {
+            UserActivityVo vo = new UserActivityVo();
+            BeanUtils.copyProperties(item, vo);
+            if(!UserActivityEnum.JOIN.equals(condition.getType())){
+                UJoinA uJoinA = new UJoinA(openId, item.getId());
+                uJoinA = uJoinAMapper.selectOne(uJoinA);
+                if (uJoinA != null && item.getType().equals(ActivityEnums.FINISH.toString())) {
+                    Long num = uJoinA.getNumber();
+                    vo.setJoin(true);
+                    Prize prize = new Prize();
+                    prize.setActivityId(item.getId());
+                    List<Prize> prizes = prizeMapper.select(prize);
+                    prizes = prizes.stream().filter(p -> p.getNum().equals(num)).collect(Collectors.toList());
+                    vo.setWin(!prizes.isEmpty());
+                } else {
+                    vo.setJoin(false);
+                    vo.setWin(false);
+                }
+            }else {
+                vo.setWin(false);
+                vo.setJoin(true);
+            }
+            userActivityVos.add(vo);
+        });
+        pageAjax.setList(userActivityVos);
+        return pageAjax;
+    }
+
+
+    /**
+     * 查询不是我参加的活动
+     * @param condition 参数
+     * @return 活动分页
+     */
+    public PageAjax<Activity> queryNoJoin(UserActivityCondition condition) {
+        PageAjax<Activity> pageAjax = new PageAjax<>();
+        RowBounds rowBounds = new RowBounds(condition.getStart() * condition.getLimit(), condition.getLimit());
+        Activity activity = new Activity();
+        activity.setType(UserActivityEnum.FINISH.equals(condition.getType()) ? ActivityEnums.FINISH.toString() : ActivityEnums.PROGRESS.toString());
+        int count = activityMapper.selectCount(activity);
+        List<Activity> list = new ArrayList<>();
+        if (count > 0) {
+            list = activityMapper.selectByExampleAndRowBounds(activity, rowBounds);
+        }
+        pageAjax.setList(list);
+        pageAjax.setTotal(count);
+        return pageAjax;
+    }
+
+    /**
+     * 查询我参加的活动
+     * @param condition 参数
+     * @param openId 用户id
+     * @return 活动分页
+     */
+    public PageAjax<Activity> queryJoin(UserActivityCondition condition, String openId){
+        PageAjax<Activity> pageAjax = new PageAjax<>();
+        int count = activityMapper.queryJoinCount(openId);
+        List<Activity> list = new ArrayList<>();
+        if (count > 0) {
+            pageAjax.setList(activityMapper.queryJoin(condition.getStart() * condition.getLimit(), condition.getLimit(), openId));
+        }
+        pageAjax.setList(list);
+        pageAjax.setTotal(count);
+        return pageAjax;
     }
 
 }

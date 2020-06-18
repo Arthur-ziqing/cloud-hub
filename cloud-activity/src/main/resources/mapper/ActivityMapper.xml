@@ -22,4 +22,12 @@
     <result column="updateTime" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="updater" jdbcType="VARCHAR" property="updater" />
   </resultMap>
+
+  <select id="queryJoin" resultType="com.arthur.cloud.activity.model.Activity">
+     select a.* from activity a left join u_join_a b on a.id = b.activityId where b.openid = #{openId} and type = 'PROGRESS' limit ${start},${limit}
+  </select>
+
+  <select id="queryJoinCount" resultType="java.lang.Integer">
+    select count(1) from activity a left join u_join_a b on a.id = b.activityId where b.openid = #{openId} and type = 'PROGRESS'
+  </select>
 </mapper>

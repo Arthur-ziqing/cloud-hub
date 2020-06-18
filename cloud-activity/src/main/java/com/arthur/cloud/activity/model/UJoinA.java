@@ -30,4 +30,11 @@ public class UJoinA implements Serializable {
      */
     private Long number;
 
+    public UJoinA() {
+    }
+
+    public UJoinA(String openid, Long activityId) {
+        this.openid = openid;
+        this.activityId = activityId;
+    }
 }

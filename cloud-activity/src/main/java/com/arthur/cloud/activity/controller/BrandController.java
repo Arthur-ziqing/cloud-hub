@@ -37,7 +37,7 @@ public class BrandController {
     private BrandService brandService;
 
 
-    @ApiOperation(value = "品牌数据接入更新接口", httpMethod = "POST", notes = "品牌数据接入更新接口")
+    @ApiOperation(value = "品牌数据接入更新", httpMethod = "POST", notes = "品牌数据接入更新")
     @PostMapping("saveOrUpdate")
     public CommonResult save(@ModelAttribute BrandVo brandVo) {
         Brand brand = new Brand();

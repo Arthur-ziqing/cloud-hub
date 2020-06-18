@@ -6,6 +6,7 @@ import com.arthur.cloud.activity.util.PageAjax;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.common.Mapper;
 import tk.mybatis.mapper.common.MySqlMapper;
 import tk.mybatis.mapper.entity.Example;
@@ -17,6 +18,7 @@ import java.util.List;
  * @param <T>
  */
 @Service
+@Transactional(rollbackFor = Exception.class)
 public abstract class BaseService<T> {
 
     @Autowired

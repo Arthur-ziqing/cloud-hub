@@ -1,13 +1,16 @@
 package com.arthur.cloud.activity.controller;
 
 import com.arthur.cloud.activity.model.Activity;
+import com.arthur.cloud.activity.model.User;
 import com.arthur.cloud.activity.model.condition.PageCondition;
+import com.arthur.cloud.activity.model.condition.UserActivityCondition;
 import com.arthur.cloud.activity.model.vo.ActivityVo;
+import com.arthur.cloud.activity.model.vo.UserActivityVo;
 import com.arthur.cloud.activity.service.ActivityService;
 import com.arthur.cloud.activity.service.PrizeService;
 import com.arthur.cloud.activity.util.CommonResult;
+import com.arthur.cloud.activity.util.JWTUtil;
 import com.arthur.cloud.activity.util.PageAjax;
-import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @Author 秦梓青
@@ -34,10 +38,8 @@ public class ActivityController {
     @Resource
     private ActivityService activityService;
 
-    @Resource
-    private PrizeService prizeService;
 
-    @ApiOperation(value = "新建活动", httpMethod = "POST", notes = "新建活动")
+    @ApiOperation(value = "活动数据接入更新", httpMethod = "POST", notes = "活动数据接入更新")
     @PostMapping("/saveOrUpdate")
     public CommonResult save(@ModelAttribute ActivityVo activityVo){
         try {
@@ -60,6 +62,7 @@ public class ActivityController {
         return pageAjax;
     }
 
+    @ApiOperation(value = "活动删除", notes = "活动删除")
     @DeleteMapping("{id}")
     public CommonResult delete(@PathVariable Long id){
         try {
@@ -70,4 +73,14 @@ public class ActivityController {
         }
         return new CommonResult();
     }
+
+    @ApiOperation(value = "用户端活动分页", httpMethod = "GET", notes = "用户端活动分页")
+    @GetMapping("/appPage")
+    public PageAjax<UserActivityVo> queryByPageAndType(@ModelAttribute UserActivityCondition condition, HttpServletRequest request){
+        User users = JWTUtil.getToken(request);
+        return activityService.queryPageByType(condition,users.getOpenId());
+    }
+
+
+
 }
