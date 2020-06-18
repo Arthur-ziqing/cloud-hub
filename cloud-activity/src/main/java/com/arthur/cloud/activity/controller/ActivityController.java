@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
+import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 
@@ -54,9 +55,8 @@ public class ActivityController {
     public PageAjax<Activity> queryByPage(@ModelAttribute PageCondition pageCondition){
         PageAjax<Activity> pageAjax = new PageAjax<>();
         BeanUtils.copyProperties(pageCondition,pageAjax);
-        PageInfo<Activity> pageInfo = activityService.queryByPage(pageAjax);
-        pageAjax.setList(pageInfo.getList());
-        pageAjax.setTotal(pageInfo.getTotal());
+        Example example = new Example(Activity.class);
+        pageAjax = activityService.queryByPage(pageAjax,example);
         return pageAjax;
     }
 

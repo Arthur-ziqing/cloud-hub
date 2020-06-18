@@ -1,14 +1,14 @@
 package com.arthur.cloud.activity.service;
 
 import com.arthur.cloud.activity.util.CommonResult;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import com.arthur.cloud.activity.util.AppUtil;
 import com.arthur.cloud.activity.util.PageAjax;
+import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
 import tk.mybatis.mapper.common.MySqlMapper;
+import tk.mybatis.mapper.entity.Example;
 
 import java.util.List;
 
@@ -54,10 +54,11 @@ public abstract class BaseService<T> {
     	return mapper.selectAll();
     }
 
-    public PageInfo<T> queryByPage(PageAjax<T> page){
-        PageHelper.startPage(page.getStart(), page.getLimit());
-        List<T> list = mapper.selectAll();
-        return new PageInfo<T>(list);
+    public PageAjax<T> queryByPage(PageAjax<T> page, Example example){
+        RowBounds rowBounds = new RowBounds(page.getStart() * page.getLimit(), page.getLimit());
+        page.setTotal(mapper.selectCountByExample(example));
+        page.setList(mapper.selectByExampleAndRowBounds(example,rowBounds));
+        return page;
     }
 
     public CommonResult save(T entity) {

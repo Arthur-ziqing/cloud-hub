@@ -1,5 +1,6 @@
 package com.arthur.cloud.activity.controller;
 
+import com.arthur.cloud.activity.model.Activity;
 import com.arthur.cloud.activity.model.Brand;
 import com.arthur.cloud.activity.model.condition.PageCondition;
 import com.arthur.cloud.activity.model.vo.BrandVo;
@@ -12,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
+import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -58,9 +60,8 @@ public class BrandController {
     public PageAjax<Brand> queryByPage(@ModelAttribute PageCondition condition){
         PageAjax<Brand> pageAjax = new PageAjax<>();
         BeanUtils.copyProperties(condition,pageAjax);
-        PageInfo<Brand> pageInfo = brandService.queryByPage(pageAjax);
-        pageAjax.setList(pageInfo.getList());
-        pageAjax.setTotal(pageInfo.getTotal());
+        Example example = new Example(Brand.class);
+        pageAjax = brandService.queryByPage(pageAjax,example);
         return pageAjax;
     }
 
