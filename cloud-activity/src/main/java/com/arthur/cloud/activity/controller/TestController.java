@@ -2,6 +2,7 @@ package com.arthur.cloud.activity.controller;
 
 import com.arthur.cloud.activity.service.UserService;
 import com.arthur.cloud.activity.util.CommonResult;
+import com.arthur.cloud.activity.util.JWTUtil;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,5 +35,10 @@ public class TestController {
     @GetMapping("/test1")
     public CommonResult test1(){
         return new CommonResult(usersService.queryAll());
+    }
+
+    @GetMapping("/test3")
+    public String test3(String openId,String nickName){
+        return JWTUtil.sign(openId,nickName);
     }
 }
