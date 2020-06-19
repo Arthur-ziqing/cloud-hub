@@ -78,7 +78,7 @@ public class JWTUtil {
     }
 
 
-    public static User getToken(HttpServletRequest request) {
+    public static User getToken(HttpServletRequest request){
         Enumeration headerNames = request.getHeaderNames();
         Map<String, String> map = new HashMap<String, String>();
         while (headerNames.hasMoreElements()) {
@@ -88,14 +88,16 @@ public class JWTUtil {
         }
 
         String token = map.get("authorization");
+        if(token == null){
+            throw new RuntimeException("无授权登录！");
+        }
         String openId = JWTUtil.getUsername(token);
+        if (openId == null ) {
+            throw new RuntimeException("token 失效");
+        }
         User users = new User();
         users.setOpenId(openId);
 
         return users;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(sign("1234","qzq"));
     }
 }

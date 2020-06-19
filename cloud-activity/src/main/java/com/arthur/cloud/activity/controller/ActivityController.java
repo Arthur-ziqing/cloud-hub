@@ -12,6 +12,7 @@ import com.arthur.cloud.activity.util.CommonResult;
 import com.arthur.cloud.activity.util.JWTUtil;
 import com.arthur.cloud.activity.util.PageAjax;
 import io.swagger.annotations.ApiOperation;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
