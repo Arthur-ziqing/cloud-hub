@@ -1,5 +1,6 @@
 package com.arthur.cloud.activity.util;
 
+import com.arthur.cloud.activity.exception.BusinessException;
 import com.arthur.cloud.activity.model.User;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -16,8 +17,10 @@ import java.util.Map;
 
 public class JWTUtil {
 
-    // 过期时间15天
-    private static final long EXPIRE_TIME = 15 * 24 * 60 * 60 * 1000;
+    /**
+     * 过期时间设置为20年
+     */
+    private static final long EXPIRE_TIME = 20 * 365 * 24 * 3600000;
 
     /**
      * 校验token是否正确
@@ -78,7 +81,7 @@ public class JWTUtil {
     }
 
 
-    public static User getToken(HttpServletRequest request){
+    public static User getToken(HttpServletRequest request) throws BusinessException {
         Enumeration headerNames = request.getHeaderNames();
         Map<String, String> map = new HashMap<String, String>();
         while (headerNames.hasMoreElements()) {
@@ -89,11 +92,11 @@ public class JWTUtil {
 
         String token = map.get("authorization");
         if(token == null){
-            throw new RuntimeException("无授权登录！");
+            throw new BusinessException("无授权登录","9999");
         }
         String openId = JWTUtil.getUsername(token);
         if (openId == null ) {
-            throw new RuntimeException("token 失效");
+            throw new BusinessException("token 失效","9998");
         }
         User users = new User();
         users.setOpenId(openId);

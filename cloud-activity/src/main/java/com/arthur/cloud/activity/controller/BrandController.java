@@ -57,12 +57,12 @@ public class BrandController {
 
     @ApiOperation(value = "品牌数据分页查询", httpMethod = "GET", notes = "品牌数据分页查询")
     @GetMapping("/queryByPage")
-    public PageAjax<Brand> queryByPage(@ModelAttribute PageCondition condition){
+    public CommonResult queryByPage(@ModelAttribute PageCondition condition){
         PageAjax<Brand> pageAjax = new PageAjax<>();
         BeanUtils.copyProperties(condition,pageAjax);
         Example example = new Example(Brand.class);
         pageAjax = brandService.queryByPage(pageAjax,example);
-        return pageAjax;
+        return new CommonResult(pageAjax);
     }
 
     @ApiOperation(value = "品牌数据删除", notes = "品牌数据删除")

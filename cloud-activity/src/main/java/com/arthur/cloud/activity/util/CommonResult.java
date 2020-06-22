@@ -10,6 +10,7 @@ public class CommonResult {
 
     private boolean hasError = false;
 
+    private String code = "200";
     private String msg = "操作成功";
     private Object data;
 
@@ -39,14 +40,12 @@ public class CommonResult {
         this.msg = msg;
     }
 
-    public CommonResult() {
-    }
-    public String getRetmsg() {
-        return msg;
+    public CommonResult(String code, String msg) {
+        this.code = code;
+        this.msg = msg;
     }
 
-    public void setRetmsg(String msg) {
-        this.msg = msg;
+    public CommonResult() {
     }
 
     public Object getData() {
@@ -65,10 +64,27 @@ public class CommonResult {
         this.hasError = hasError;
     }
 
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+
     @Override
     public String toString() {
         return "CommonResult{" +
                 "hasError=" + hasError +
+                ", code='" + code + '\'' +
                 ", msg='" + msg + '\'' +
                 ", data=" + data +
                 '}';

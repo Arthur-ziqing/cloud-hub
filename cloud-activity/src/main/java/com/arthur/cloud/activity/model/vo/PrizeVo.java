@@ -23,12 +23,6 @@ public class PrizeVo implements Serializable {
     private Long id;
 
     /**
-     * 活动id
-     */
-    @ApiModelProperty(value = "活动id",dataType = "Long")
-    private Long activityId;
-
-    /**
      * 等级名称
      */
     @ApiModelProperty(value = "等级名称",dataType = "String")

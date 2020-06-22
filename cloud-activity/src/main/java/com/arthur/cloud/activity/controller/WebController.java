@@ -101,33 +101,35 @@ public class WebController {
         User user = userService.getUser(u);
         //uuid生成唯一key
         String skey = UUID.randomUUID().toString();
-        if (user == null) {
-            //入库
-            String nickName = rawDataJson.getString("nickName");
-            String avatarUrl = rawDataJson.getString("avatarUrl");
-            String gender = rawDataJson.getString("gender");
-            String city = rawDataJson.getString("city");
-            String country = rawDataJson.getString("country");
-            String province = rawDataJson.getString("province");
-            String language = rawDataJson.getString("language");
+        //入库
+        String nickName = rawDataJson.getString("nickName");
+        String avatarUrl = rawDataJson.getString("avatarUrl");
+        String gender = rawDataJson.getString("gender");
+        String city = rawDataJson.getString("city");
+        String country = rawDataJson.getString("country");
+        String province = rawDataJson.getString("province");
+        String language = rawDataJson.getString("language");
 
-            user = new User();
-            user.setOpenId(openid);
-            user.setCreatetime(new Date());
-            user.setNickname(nickName);
-            user.setCountry(country);
-            user.setCity(city);
-            user.setProvince(province);
-            user.setAvatarUrl(avatarUrl);
-            user.setGender(Integer.parseInt(gender));
-            user.setUpdatetime(new Date());
-            user.setSessionKey(sessionKey);
-            user.setSkey(skey);
-            user.setLanguage(language);
+        user = new User();
+        user.setOpenId(openid);
+        user.setCreatetime(new Date());
+        user.setNickname(nickName);
+        user.setCountry(country);
+        user.setCity(city);
+        user.setProvince(province);
+        user.setAvatarUrl(avatarUrl);
+        user.setGender(Integer.parseInt(gender));
+        user.setUpdatetime(new Date());
+        user.setSessionKey(sessionKey);
+        user.setSkey(skey);
+        user.setLanguage(language);
+        if (user == null) {
+
             userService.insert(user);
         } else {
             //已存在
             logger.info("用户openid已存在,不需要插入");
+            userService.update(user);
         }
         //根据openid查询skey是否存在
         String skey_redis = redisTemplate.opsForValue().get(openid);

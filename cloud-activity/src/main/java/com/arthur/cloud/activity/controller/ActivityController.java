@@ -1,5 +1,6 @@
 package com.arthur.cloud.activity.controller;
 
+import com.arthur.cloud.activity.exception.BusinessException;
 import com.arthur.cloud.activity.model.Activity;
 import com.arthur.cloud.activity.model.User;
 import com.arthur.cloud.activity.model.condition.PageCondition;
@@ -55,12 +56,12 @@ public class ActivityController {
 
     @ApiOperation(value = "活动列表分页查询", httpMethod = "GET", notes = "活动列表分页查询")
     @GetMapping("/queryByPage")
-    public PageAjax<Activity> queryByPage(@ModelAttribute PageCondition pageCondition){
+    public CommonResult queryByPage(@ModelAttribute PageCondition pageCondition){
         PageAjax<Activity> pageAjax = new PageAjax<>();
         BeanUtils.copyProperties(pageCondition,pageAjax);
         Example example = new Example(Activity.class);
         pageAjax = activityService.queryByPage(pageAjax,example);
-        return pageAjax;
+        return new CommonResult(pageAjax);
     }
 
     @ApiOperation(value = "活动删除", notes = "活动删除")
@@ -77,11 +78,20 @@ public class ActivityController {
 
     @ApiOperation(value = "用户端活动分页", httpMethod = "GET", notes = "用户端活动分页")
     @GetMapping("/appPage")
-    public PageAjax<UserActivityVo> queryByPageAndType(@ModelAttribute UserActivityCondition condition, HttpServletRequest request){
-        User users = JWTUtil.getToken(request);
-        return activityService.queryPageByType(condition,users.getOpenId());
+    public CommonResult queryByPageAndType(@ModelAttribute UserActivityCondition condition, HttpServletRequest request) {
+        CommonResult result = new CommonResult();
+        try {
+            User users = JWTUtil.getToken(request);
+            PageAjax<UserActivityVo> pageAjax = activityService.queryPageByType(condition,users.getOpenId());
+            result.setData(pageAjax);
+            return result;
+        }catch (BusinessException e){
+            logger.info("error",e);
+            result.setHasError(true);
+            result.setMsg(e.getMessageKey());
+            result.setCode(e.getErrorCode());
+            return result;
+        }
     }
-
-
 
 }
