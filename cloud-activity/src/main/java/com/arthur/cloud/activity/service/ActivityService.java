@@ -107,39 +107,41 @@ public class ActivityService extends BaseService<Activity> {
         }
         List<UserActivityVo> userActivityVos = new ArrayList<>();
         BeanUtils.copyProperties(list, pageAjax);
-        list.getList().forEach(item -> {
-            UserActivityVo vo = new UserActivityVo();
-            BeanUtils.copyProperties(item, vo);
-            if (!UserActivityEnum.JOIN.equals(condition.getType())) {
-                UJoinA uJoinA = new UJoinA(openId, item.getId());
-                uJoinA = uJoinAMapper.selectOne(uJoinA);
-                if (uJoinA != null && item.getType().equals(ActivityEnums.FINISH.toString())) {
-                    Long num = uJoinA.getNumber();
-                    vo.setJoin(true);
-                    Prize prize = new Prize();
-                    prize.setActivityId(item.getId());
-                    List<Prize> prizes = prizeMapper.select(prize);
-                    prizes = prizes.stream().filter(p -> p.getNum().equals(num)).collect(Collectors.toList());
-                    vo.setWin(!prizes.isEmpty());
+        if (list.getList() != null) {
+            list.getList().forEach(item -> {
+                UserActivityVo vo = new UserActivityVo();
+                BeanUtils.copyProperties(item, vo);
+                if (!UserActivityEnum.JOIN.equals(condition.getType())) {
+                    UJoinA uJoinA = new UJoinA(openId, item.getId());
+                    uJoinA = uJoinAMapper.selectOne(uJoinA);
+                    if (uJoinA != null && item.getType().equals(ActivityEnums.FINISH.toString())) {
+                        Long num = uJoinA.getNumber();
+                        vo.setJoin(true);
+                        Prize prize = new Prize();
+                        prize.setActivityId(item.getId());
+                        List<Prize> prizes = prizeMapper.select(prize);
+                        prizes = prizes.stream().filter(p -> p.getNum().equals(num)).collect(Collectors.toList());
+                        vo.setWin(!prizes.isEmpty());
+                    } else {
+                        vo.setJoin(false);
+                        vo.setWin(false);
+                    }
                 } else {
-                    vo.setJoin(false);
                     vo.setWin(false);
+                    vo.setJoin(true);
                 }
-            } else {
-                vo.setWin(false);
-                vo.setJoin(true);
-            }
-            if (item.getBrandId() != null) {
-                Brand brand = new Brand();
-                brand.setId(item.getBrandId());
-                brand = brandMapper.selectOne(brand);
-                if (brand != null) {
-                    vo.setBrandName(brand.getBrandName());
-                    vo.setBrandLogo(brand.getLogo());
+                if (item.getBrandId() != null) {
+                    Brand brand = new Brand();
+                    brand.setId(item.getBrandId());
+                    brand = brandMapper.selectOne(brand);
+                    if (brand != null) {
+                        vo.setBrandName(brand.getBrandName());
+                        vo.setBrandLogo(brand.getLogo());
+                    }
                 }
-            }
-            userActivityVos.add(vo);
-        });
+                userActivityVos.add(vo);
+            });
+        }
         pageAjax.setList(userActivityVos);
         return pageAjax;
     }

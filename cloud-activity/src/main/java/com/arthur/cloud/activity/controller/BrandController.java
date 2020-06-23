@@ -40,10 +40,12 @@ public class BrandController {
     @ApiOperation(value = "品牌数据接入更新", httpMethod = "POST", notes = "品牌数据接入更新")
     @PostMapping("saveOrUpdate")
     public CommonResult save(BrandVo brandVo) {
+        logger.info(" 品牌数据接入开始");
+        logger.info("品牌数据为=" + brandVo.toString());
         Brand brand = new Brand();
         BeanUtils.copyProperties(brandVo, brand);
         if (brandVo.getId() == null) {
-            brand.setUpdater(brandVo.getOperator());
+            brand.setCreator(brandVo.getOperator());
             brand.setCreateTime(new Date());
             brand.setUpdater(brandVo.getOperator());
             brand.setUpdateTime(new Date());
