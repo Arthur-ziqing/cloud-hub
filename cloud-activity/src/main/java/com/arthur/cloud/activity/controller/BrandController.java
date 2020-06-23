@@ -25,7 +25,6 @@ import java.util.Date;
  * @create 2020-06-17 11:51
  * @Version 1.0
  **/
-@CrossOrigin
 @RestController
 @RequestMapping("brand")
 public class BrandController {
@@ -38,8 +37,8 @@ public class BrandController {
 
 
     @ApiOperation(value = "品牌数据接入更新", httpMethod = "POST", notes = "品牌数据接入更新")
-    @PostMapping("saveOrUpdate")
-    public CommonResult save(BrandVo brandVo) {
+    @PostMapping(value = "/saveOrUpdate")
+    public CommonResult save(@ModelAttribute BrandVo brandVo) {
         logger.info(" 品牌数据接入开始");
         logger.info("品牌数据为=" + brandVo.toString());
         Brand brand = new Brand();
@@ -67,9 +66,11 @@ public class BrandController {
         return new CommonResult(pageAjax);
     }
 
-    @ApiOperation(value = "品牌数据删除", notes = "品牌数据删除")
+    @ApiOperation(value = "品牌数据删除",httpMethod = "DELETE", notes = "品牌数据删除")
     @DeleteMapping("{id}")
-    public CommonResult delete(@PathVariable Integer id){
+    public CommonResult delete(@PathVariable Long id){
+        Brand brand = new Brand();
+        brand.setId(id);
         return brandService.delete(id);
     }
 }

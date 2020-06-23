@@ -14,6 +14,7 @@ public class Brand implements Serializable {
 
     private static final long serialVersionUID = 1987129393259342745L;
 
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

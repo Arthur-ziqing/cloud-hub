@@ -3,6 +3,7 @@ package com.arthur.cloud.activity.model;
 import lombok.Data;
 
 import javax.persistence.Column;
+import javax.persistence.Id;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -11,6 +12,7 @@ public class User implements Serializable {
 
     private static final long serialVersionUID = -4900248123286980845L;
 
+    @Id
     @Column(name = "openId")
     private String openId;
 
