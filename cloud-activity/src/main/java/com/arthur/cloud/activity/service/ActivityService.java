@@ -1,9 +1,11 @@
 package com.arthur.cloud.activity.service;
 
 import com.arthur.cloud.activity.mapper.ActivityMapper;
+import com.arthur.cloud.activity.mapper.BrandMapper;
 import com.arthur.cloud.activity.mapper.PrizeMapper;
 import com.arthur.cloud.activity.mapper.UJoinAMapper;
 import com.arthur.cloud.activity.model.Activity;
+import com.arthur.cloud.activity.model.Brand;
 import com.arthur.cloud.activity.model.Prize;
 import com.arthur.cloud.activity.model.UJoinA;
 import com.arthur.cloud.activity.model.condition.UserActivityCondition;
@@ -53,6 +55,9 @@ public class ActivityService extends BaseService<Activity> {
     @Resource
     private ActivityService activityService;
 
+    @Resource
+    private BrandMapper brandMapper;
+
 
     public void saveOrUpdate(ActivityVo vo) {
         Activity activity = new Activity();
@@ -97,15 +102,15 @@ public class ActivityService extends BaseService<Activity> {
         PageAjax<Activity> list;
         if (!UserActivityEnum.JOIN.equals(condition.getType())) {
             list = queryNoJoin(condition);
-        }else {
-            list = queryJoin(condition,openId);
+        } else {
+            list = queryJoin(condition, openId);
         }
         List<UserActivityVo> userActivityVos = new ArrayList<>();
-        BeanUtils.copyProperties(list,pageAjax);
+        BeanUtils.copyProperties(list, pageAjax);
         list.getList().forEach(item -> {
             UserActivityVo vo = new UserActivityVo();
             BeanUtils.copyProperties(item, vo);
-            if(!UserActivityEnum.JOIN.equals(condition.getType())){
+            if (!UserActivityEnum.JOIN.equals(condition.getType())) {
                 UJoinA uJoinA = new UJoinA(openId, item.getId());
                 uJoinA = uJoinAMapper.selectOne(uJoinA);
                 if (uJoinA != null && item.getType().equals(ActivityEnums.FINISH.toString())) {
@@ -120,9 +125,18 @@ public class ActivityService extends BaseService<Activity> {
                     vo.setJoin(false);
                     vo.setWin(false);
                 }
-            }else {
+            } else {
                 vo.setWin(false);
                 vo.setJoin(true);
+            }
+            if (item.getBrandId() != null) {
+                Brand brand = new Brand();
+                brand.setId(item.getBrandId());
+                brand = brandMapper.selectOne(brand);
+                if (brand != null) {
+                    vo.setBrandName(brand.getBrandName());
+                    vo.setBrandLogo(brand.getLogo());
+                }
             }
             userActivityVos.add(vo);
         });
@@ -133,29 +147,31 @@ public class ActivityService extends BaseService<Activity> {
 
     /**
      * 查询不是我参加的活动
+     *
      * @param condition 参数
      * @return 活动分页
      */
     public PageAjax<Activity> queryNoJoin(UserActivityCondition condition) {
         PageAjax<Activity> pageAjax = new PageAjax<>();
-        BeanUtils.copyProperties(condition,pageAjax);
+        BeanUtils.copyProperties(condition, pageAjax);
         Activity activity = new Activity();
         activity.setType(UserActivityEnum.FINISH.equals(condition.getType()) ? ActivityEnums.FINISH.toString() : ActivityEnums.PROGRESS.toString());
         int count = activityMapper.selectCount(activity);
         Example example = new Example(Activity.class);
         if (count > 0) {
-            pageAjax = activityService.queryByPage(pageAjax,example);
+            pageAjax = activityService.queryByPage(pageAjax, example);
         }
         return pageAjax;
     }
 
     /**
      * 查询我参加的活动
+     *
      * @param condition 参数
-     * @param openId 用户id
+     * @param openId    用户id
      * @return 活动分页
      */
-    public PageAjax<Activity> queryJoin(UserActivityCondition condition, String openId){
+    public PageAjax<Activity> queryJoin(UserActivityCondition condition, String openId) {
         PageAjax<Activity> pageAjax = new PageAjax<>();
         int count = activityMapper.queryJoinCount(openId);
         List<Activity> list = new ArrayList<>();

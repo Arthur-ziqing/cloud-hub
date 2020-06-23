@@ -65,7 +65,7 @@ public class ActivityVo extends OperatorVo {
     /**
      * 品牌id
      */
-    @ApiModelProperty(value = "品牌id")
+    @ApiModelProperty(value = "品牌id", required = true)
     private Long brandId;
 
     /**

@@ -1,10 +1,5 @@
 package com.arthur.cloud.activity.model.vo;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -16,19 +11,16 @@ import java.util.Date;
  * @create 2020-06-18 13:50
  * @Version 1.0
  **/
-@ApiModel(description = "用户端活动列表数据")
 @Data
 public class UserActivityVo implements Serializable {
 
     private static final long serialVersionUID = 1823859825020608086L;
 
-    @ApiModelProperty(value = "活动id")
     private Long id;
 
     /**
      * 活动标题
      */
-    @ApiModelProperty(value = "活动标题")
     private String title;
 
     /**
@@ -68,13 +60,22 @@ public class UserActivityVo implements Serializable {
     /**
      * 是否参加
      */
-    @ApiModelProperty(value = "开奖时间",dataType = "yyyy-MM-dd HH:mm:ss")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private boolean isJoin;
 
     /**
      * 是否中奖
      */
     private boolean isWin;
+
+
+    /**
+     * 品牌logo
+     */
+    private String brandLogo;
+
+    /**
+     * 品牌名称
+     */
+    private String brandName;
+
 }

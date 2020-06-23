@@ -56,6 +56,7 @@ public class ActivityController {
 
     @ApiOperation(value = "活动列表分页查询", httpMethod = "GET", notes = "活动列表分页查询")
     @GetMapping("/queryByPage")
+    @RequiresAuthentication
     public CommonResult queryByPage(PageCondition pageCondition){
         PageAjax<Activity> pageAjax = new PageAjax<>();
         BeanUtils.copyProperties(pageCondition,pageAjax);
