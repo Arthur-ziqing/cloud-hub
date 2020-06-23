@@ -26,7 +26,6 @@ public class CommonResult {
     }
 
     public CommonResult(Object data) {
-        this.msg = "查询成功";
         this.data = data;
     }
 

@@ -39,47 +39,20 @@ public class Swagger2Config  extends WebMvcConfigurerAdapter {
                 .addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 
-//
-//    @Bean
-//    public Docket stockApi() {
-//        return new Docket(DocumentationType.SWAGGER_2)
-//                .groupName("库存")
-//                .genericModelSubstitutes(DeferredResult.class)
-//                .useDefaultResponseMessages(false)
-//                .forCodeGeneration(true)
-//                .pathMapping("/")// base，最终调用接口后会和paths拼接在一起
-//                .select()
-//                .paths(or(regex("/stock/.*")))//过滤的接口
-//                .build()
-//                .apiInfo(stockApiInfo());
-//    }
-//
-//    private ApiInfo stockApiInfo() {
-//        return new ApiInfoBuilder()
-//                .title("库存管理")//大标题
-//                .description("根据条件查询库存")//详细描述
-//                .version("1.0")//版本
-//                .contact(new Contact("日播开发团队", null, "http://itwx.ribo.com.cn/"))//作者
-//                //.license("2.0apache许可证")
-//                //.licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
-//                .build();
-//    }
-
-
     @Bean
     public Docket createRestApi() {
-        Predicate<RequestHandler> predicate = new Predicate<RequestHandler>() {
-            @Override
-            public boolean apply(RequestHandler input) {
-                Class<?> declaringClass = input.declaringClass();
-                if (declaringClass == BasicErrorController.class)// 排除
-                    return false;
-                if(declaringClass.isAnnotationPresent(RestController.class)) // 被注解的类
-                    return true;
-                if(input.isAnnotatedWith(ResponseBody.class)) // 被注解的方法
-                    return true;
+        Predicate<RequestHandler> predicate = input -> {
+            Class<?> declaringClass = input.declaringClass();
+            // 排除
+            if (declaringClass == BasicErrorController.class)
                 return false;
-            }
+            // 被注解的类
+            if(declaringClass.isAnnotationPresent(RestController.class))
+                return true;
+            // 被注解的方法
+            if(input.isAnnotatedWith(ResponseBody.class))
+                return true;
+            return false;
         };
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
@@ -91,10 +64,101 @@ public class Swagger2Config  extends WebMvcConfigurerAdapter {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("幸运小活动")//大标题
-                .version("1.0")//版本
-                .contact(new Contact("惊叹号开发团队", null,null))//作者
+                //大标题
+                .title("幸运小活动")
+                //版本
+                .version("1.0")
+                //作者
+                .contact(new Contact("惊叹号开发团队", null,null))
                 .build();
     }
+
+    @Bean
+    public Docket webApi() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .groupName("web")
+                .genericModelSubstitutes(DeferredResult.class)
+                .useDefaultResponseMessages(false)
+                .forCodeGeneration(true)
+                // base，最终调用接口后会和paths拼接在一起
+                .pathMapping("/")
+                .select()
+                //过滤的接口
+                .paths(or(regex("/web/.*")))
+                .build()
+                .apiInfo(webApiInfo());
+    }
+
+    private ApiInfo webApiInfo() {
+        return new ApiInfoBuilder()
+                //大标题
+                .title("授权登录")
+                //详细描述
+                .description("授权登录、更新用户信息")
+                //版本
+                .version("1.0")
+                //作者
+                .contact(new Contact("arthur", "https://github.com/Arthur-qin", null))
+                .build();
+    }
+
+    @Bean
+    public Docket brandApi() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .groupName("品牌业务接口")
+                .genericModelSubstitutes(DeferredResult.class)
+                .useDefaultResponseMessages(false)
+                .forCodeGeneration(true)
+                // base，最终调用接口后会和paths拼接在一起
+                .pathMapping("/")
+                .select()
+                //过滤的接口
+                .paths(or(regex("/brand/.*")))
+                .build()
+                .apiInfo(brandApiInfo());
+    }
+
+    private ApiInfo brandApiInfo() {
+        return new ApiInfoBuilder()
+                //大标题
+                .title("品牌业务")
+                //详细描述
+                .description("品牌业务接口")
+                //版本
+                .version("1.0")
+                //作者
+                .contact(new Contact("arthur", "https://github.com/Arthur-qin", null))
+                .build();
+    }
+
+    @Bean
+    public Docket activityApi() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .groupName("活动业务接口")
+                .genericModelSubstitutes(DeferredResult.class)
+                .useDefaultResponseMessages(false)
+                .forCodeGeneration(true)
+                // base，最终调用接口后会和paths拼接在一起
+                .pathMapping("/")
+                .select()
+                //过滤的接口
+                .paths(or(regex("/activity/.*")))
+                .build()
+                .apiInfo(activityApiInfo());
+    }
+
+    private ApiInfo activityApiInfo() {
+        return new ApiInfoBuilder()
+                //大标题
+                .title("活动业务")
+                //详细描述
+                .description("活动业务接口")
+                //版本
+                .version("1.0")
+                //作者
+                .contact(new Contact("arthur", "https://github.com/Arthur-qin", null))
+                .build();
+    }
+
 
 }

@@ -50,23 +50,12 @@ public class User implements Serializable {
      */
     private String language;
 
-    /**
-     * 创建时间
-     */
-    @Column(name = "createTime")
-    private Date createtime;
 
     /**
-     * 更新时间
+     * 邀请者 openid
      */
-    @Column(name = "updateTime")
-    private Date updatetime;
-
-    /**
-     * 用户登录态标识
-     */
-    @Column(name = "skey")
-    private String skey;
+    @Column(name = "inviteOpenId")
+    private String inviteOpenId;
 
 
     /**
@@ -74,5 +63,19 @@ public class User implements Serializable {
      */
     @Column(name = "sessionKey")
     private String sessionKey;
+
+
+    /**
+     * 创建时间
+     */
+    @Column(name = "createTime")
+    private Date createTime;
+
+    /**
+     * 更新时间
+     */
+    @Column(name = "updateTime")
+    private Date updateTime;
+
 
 }

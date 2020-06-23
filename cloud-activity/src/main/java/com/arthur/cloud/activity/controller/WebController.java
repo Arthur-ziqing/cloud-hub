@@ -2,27 +2,15 @@ package com.arthur.cloud.activity.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.arthur.cloud.activity.exception.BusinessException;
 import com.arthur.cloud.activity.model.User;
 import com.arthur.cloud.activity.service.UserService;
 import com.arthur.cloud.activity.service.WeChatService;
 import com.arthur.cloud.activity.util.*;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.apache.shiro.authz.annotation.RequiresRoles;
-import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -30,7 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 @CrossOrigin
 @RestController
@@ -46,117 +33,43 @@ public class WebController {
 
 
     @Resource
-    @Lazy
     private UserService userService;
 
-    @Resource
-    private RedisTemplate<String, String> redisTemplate;
 
-    @PostMapping("/updateUserInfo")
-    public void updateUserInfo(@RequestBody User user) {
-        weChatService.updateUserInfo(user);
-    }
-
-
-    @ApiResponses({
-            @ApiResponse(code = 404, message = "服务器未找到资源"),
-            @ApiResponse(code = 200, message = "请求成功"),
-            @ApiResponse(code = 500, message = "服务器错误"),
-            @ApiResponse(code = 401, message = "没有访问权限"),
-            @ApiResponse(code = 403, message = "服务器拒绝访问"),
-    })
-    @ApiOperation(value = "小程序登录", httpMethod = "POST", notes = "小程序登录")
+    @ApiOperation(value = "小程序登录", httpMethod = "GET", notes = "小程序登录")
     @ResponseBody
-    @RequestMapping("/login")
-    public Map<String, Object> doLogin(@ApiParam(required = true, value = "临时登录凭证code", name = "code")
-                                       @RequestParam(value = "code", required = true) String code,
-                                       @ApiParam(required = true, value = "用户非敏感信息", name = "rawData")
-                                       @RequestParam(value = "rawData", required = true) String rawData,
-                                       @ApiParam(required = true, value = "签名", name = "signature")
-                                       @RequestParam(value = "signature", required = true) String signature,
-                                       @ApiParam(required = true, value = "用户敏感信息", name = "encrypteData")
-                                       @RequestParam(value = "encrypteData", required = true) String encrypteData,
-                                       @ApiParam(required = true, value = "解密算法的向量", name = "iv")
-                                       @RequestParam(value = "iv", required = true) String iv) {
+    @GetMapping("/login")
+    public CommonResult doLogin(@ApiParam(required = true, value = "临时登录凭证code", name = "code")
+                                       @RequestParam(value = "code") String code,
+                                       @ApiParam(value = "邀请人code", name = "inviteCode")
+                                       @RequestParam(value = "inviteCode",required = false)String inviteCode) {
         logger.info("Start get SessionKey");
-
-
         Map<String, Object> map = new HashMap<String, Object>();
-        logger.info("用户非敏感信息" + rawData);
-
-        JSONObject rawDataJson = JSON.parseObject(rawData);
-
-        logger.info("签名" + signature);
         JSONObject sessionKeyOpenId = weChatService.getWxSession(code);
-        logger.info("post请求获取的SessionAndopenId=" + sessionKeyOpenId);
-
+        logger.info("post请求获取的Session和openId=" + sessionKeyOpenId);
         String openid = sessionKeyOpenId.getString("openid");
-
         String sessionKey = sessionKeyOpenId.getString("session_key");
-
         logger.info("openid=" + openid + ",session_key=" + sessionKey);
-
-        User u = new User();
-        u.setOpenId(openid);
-        User user = userService.getUser(u);
-        //uuid生成唯一key
-        String skey = UUID.randomUUID().toString();
-        //入库
-        String nickName = rawDataJson.getString("nickName");
-        String avatarUrl = rawDataJson.getString("avatarUrl");
-        String gender = rawDataJson.getString("gender");
-        String city = rawDataJson.getString("city");
-        String country = rawDataJson.getString("country");
-        String province = rawDataJson.getString("province");
-        String language = rawDataJson.getString("language");
-
-        user = new User();
+        User user = new User();
         user.setOpenId(openid);
-        user.setCreatetime(new Date());
-        user.setNickname(nickName);
-        user.setCountry(country);
-        user.setCity(city);
-        user.setProvince(province);
-        user.setAvatarUrl(avatarUrl);
-        user.setGender(Integer.parseInt(gender));
-        user.setUpdatetime(new Date());
-        user.setSessionKey(sessionKey);
-        user.setSkey(skey);
-        user.setLanguage(language);
+        user = userService.getUser(user);
         if (user == null) {
-
+            user = new User();
+            user.setOpenId(openid);
+            user.setCreateTime(new Date());
+            user.setUpdateTime(new Date());
+            user.setSessionKey(sessionKey);
+            if (inviteCode != null) {
+                user.setInviteOpenId(inviteCode);
+            }
             userService.insert(user);
         } else {
             //已存在
             logger.info("用户openid已存在,不需要插入");
-            userService.update(user);
         }
-        //根据openid查询skey是否存在
-        String skey_redis = redisTemplate.opsForValue().get(openid);
-        if (StringUtils.isNotBlank(skey_redis)) {
-            //存在 删除 skey 重新生成skey 将skey返回
-            redisTemplate.delete(skey_redis);
-
-        }
-        //  缓存一份新的
-        JSONObject sessionObj = new JSONObject();
-        sessionObj.put("openId", openid);
-        sessionObj.put("sessionKey", sessionKey);
-        redisTemplate.opsForValue().set(skey, sessionObj.toJSONString());
-        redisTemplate.opsForValue().set(openid, skey);
-
-        //把新的sessionKey和oppenid返回给小程序
-        map.put("skey", skey);
-        map.put("result", "0");
-
-
-        JSONObject userInfo = WXBizDataCrypt.decrypt1(encrypteData, sessionKey, iv);
-        logger.info("根据解密算法获取的userInfo=" + userInfo);
-        assert userInfo != null;
-        userInfo.put("balance", 0);
-        map.put("userInfo", userInfo);
-        map.put("token", JWTUtil.sign(user.getOpenId(), user.getNickname()));
-        return map;
+        //返回token
+        map.put("token", JWTUtil.sign(user.getOpenId(), user.getSessionKey()));
+        return new CommonResult(map);
     }
 
 
@@ -165,6 +78,7 @@ public class WebController {
      *
      * @return 当前登录用户
      */
+    @ApiOperation(value = "获取用户信息", httpMethod = "GET", notes = "获取用户信息")
     @GetMapping(value = "currentUser")
     public CommonResult getCurrentUser(HttpServletRequest request) {
 
@@ -180,45 +94,46 @@ public class WebController {
 
     }
 
-    @PostMapping(value = "autoLogin")
-    public CommonResult autoLogin(HttpServletRequest request, String code, Model model) {
+    @ApiOperation(value = "获取用户信息", httpMethod = "POST", notes = "获取用户信息")
+    @PostMapping(value = "updateInfo")
+    public CommonResult autoLogin(HttpServletRequest request,
+            @ApiParam(required = true, value = "用户信息", name = "rawData")
+            @RequestParam(value = "rawData", required = true) String rawData) {
 
-        String json = HttpRequestUtils.sendGet(WechatAccessUtils.GET_OPEN_ID_URL,
-                "appid=" + WechatAccessUtils.APPID +
-                        "&secret=" + WechatAccessUtils.SECRET +
-                        "&code=" + code + "&grant_type=authorization_code");
-        String json2 = HttpRequestUtils.sendGet(WechatAccessUtils.GET_ACCESS_TOKEN_URL,
-                "grant_type=client_credential&appid=" +
-                        WechatAccessUtils.APPID +
-                        "&secret=" + WechatAccessUtils.SECRET);
-        JSONObject jsonObject = JSONObject.parseObject(json);
-        JSONObject jsonObject2 = JSONObject.parseObject(json2);
-        String openId = (String) jsonObject.get("openid");
-        String accessToken = (String) jsonObject2.get("access_token");
-        String jsoninfo = HttpRequestUtils.sendGet(WechatAccessUtils.GET_USERINFO_URL, "access_token=" + accessToken + "&openid=" + openId + "&lang=zh_CN");
-        JSONObject jsonObjectinfo = JSONObject.parseObject(jsoninfo);
-        String headimgUrl = (String) jsonObjectinfo.get("headimgurl");
-        User user = new User();
-        user.setOpenId(openId);
-
+        CommonResult result;
+        logger.info("用户非敏感信息" + rawData);
+        JSONObject rawDataJson = JSON.parseObject(rawData);
+        User user;
         try {
-            if (user.getOpenId() != null) {
-                user = userService.queryOne(user);
-                if (user == null) {
-                    return new CommonResult(true, "Login error", openId);
-                } else {
-                    return new CommonResult(false, "Login success", JWTUtil.sign(user.getOpenId(), user.getNickname()));
-                }
-            }
-        } catch (Exception e) {
-
-            e.printStackTrace();
-            return null;
+            user = JWTUtil.getToken(request);
+        } catch (BusinessException e) {
+            logger.info("error",e);
+            result = new CommonResult(e.getErrorCode(),e.getMessage());
+            result.setHasError(true);
+            return result;
         }
-        return null;
+        user = userService.getUser(user);
+        //入库
+        String nickName = rawDataJson.getString("nickName");
+        String avatarUrl = rawDataJson.getString("avatarUrl");
+        String gender = rawDataJson.getString("gender");
+        String city = rawDataJson.getString("city");
+        String country = rawDataJson.getString("country");
+        String province = rawDataJson.getString("province");
+        String language = rawDataJson.getString("language");
+
+        user.setNickname(nickName);
+        user.setCountry(country);
+        user.setCity(city);
+        user.setProvince(province);
+        user.setAvatarUrl(avatarUrl);
+        user.setGender(Integer.parseInt(gender));
+        user.setUpdateTime(new Date());
+        user.setLanguage(language);
+        return userService.update(user);
     }
 
-    @GetMapping("/article")
+    /*@GetMapping("/article")
     public CommonResult article() {
 
         Subject subject = SecurityUtils.getSubject();
@@ -262,6 +177,6 @@ public class WebController {
     public CommonResult unauthorized() {
 
         return new CommonResult(true, "Unauthorized", null);
-    }
+    }*/
 
 }

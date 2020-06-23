@@ -39,7 +39,7 @@ public class BrandController {
 
     @ApiOperation(value = "品牌数据接入更新", httpMethod = "POST", notes = "品牌数据接入更新")
     @PostMapping("saveOrUpdate")
-    public CommonResult save(@ModelAttribute BrandVo brandVo) {
+    public CommonResult save(BrandVo brandVo) {
         Brand brand = new Brand();
         BeanUtils.copyProperties(brandVo, brand);
         if (brandVo.getId() == null) {
@@ -57,7 +57,7 @@ public class BrandController {
 
     @ApiOperation(value = "品牌数据分页查询", httpMethod = "GET", notes = "品牌数据分页查询")
     @GetMapping("/queryByPage")
-    public CommonResult queryByPage(@ModelAttribute PageCondition condition){
+    public CommonResult queryByPage(PageCondition condition){
         PageAjax<Brand> pageAjax = new PageAjax<>();
         BeanUtils.copyProperties(condition,pageAjax);
         Example example = new Example(Brand.class);

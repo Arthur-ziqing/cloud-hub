@@ -50,6 +50,9 @@ public class ActivityService extends BaseService<Activity> {
     @Resource
     private UJoinAMapper uJoinAMapper;
 
+    @Resource
+    private ActivityService activityService;
+
 
     public void saveOrUpdate(ActivityVo vo) {
         Activity activity = new Activity();
@@ -135,16 +138,14 @@ public class ActivityService extends BaseService<Activity> {
      */
     public PageAjax<Activity> queryNoJoin(UserActivityCondition condition) {
         PageAjax<Activity> pageAjax = new PageAjax<>();
-        RowBounds rowBounds = new RowBounds(condition.getStart() * condition.getLimit(), condition.getLimit());
+        BeanUtils.copyProperties(condition,pageAjax);
         Activity activity = new Activity();
         activity.setType(UserActivityEnum.FINISH.equals(condition.getType()) ? ActivityEnums.FINISH.toString() : ActivityEnums.PROGRESS.toString());
         int count = activityMapper.selectCount(activity);
-        List<Activity> list = new ArrayList<>();
+        Example example = new Example(Activity.class);
         if (count > 0) {
-            list = activityMapper.selectByExampleAndRowBounds(activity, rowBounds);
+            pageAjax = activityService.queryByPage(pageAjax,example);
         }
-        pageAjax.setList(list);
-        pageAjax.setTotal(count);
         return pageAjax;
     }
 

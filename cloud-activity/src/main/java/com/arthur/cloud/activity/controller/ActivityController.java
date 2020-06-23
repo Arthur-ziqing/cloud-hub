@@ -43,7 +43,7 @@ public class ActivityController {
 
     @ApiOperation(value = "活动数据接入更新", httpMethod = "POST", notes = "活动数据接入更新")
     @PostMapping("/saveOrUpdate")
-    public CommonResult save(@ModelAttribute ActivityVo activityVo){
+    public CommonResult save(ActivityVo activityVo){
         try {
             activityService.saveOrUpdate(activityVo);
         }catch (Exception e){
@@ -56,7 +56,7 @@ public class ActivityController {
 
     @ApiOperation(value = "活动列表分页查询", httpMethod = "GET", notes = "活动列表分页查询")
     @GetMapping("/queryByPage")
-    public CommonResult queryByPage(@ModelAttribute PageCondition pageCondition){
+    public CommonResult queryByPage(PageCondition pageCondition){
         PageAjax<Activity> pageAjax = new PageAjax<>();
         BeanUtils.copyProperties(pageCondition,pageAjax);
         Example example = new Example(Activity.class);
@@ -78,7 +78,7 @@ public class ActivityController {
 
     @ApiOperation(value = "用户端活动分页", httpMethod = "GET", notes = "用户端活动分页")
     @GetMapping("/appPage")
-    public CommonResult queryByPageAndType(@ModelAttribute UserActivityCondition condition, HttpServletRequest request) {
+    public CommonResult queryByPageAndType(UserActivityCondition condition, HttpServletRequest request) {
         CommonResult result = new CommonResult();
         try {
             User users = JWTUtil.getToken(request);

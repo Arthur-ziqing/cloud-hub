@@ -14,6 +14,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.InvalidParameterSpecException;
 import java.util.Arrays;
@@ -66,10 +67,10 @@ public class WXBizDataCrypt {
             cipher.init( Cipher.DECRYPT_MODE, spec, parameters);
             byte[] resultByte = cipher.doFinal(dataByte);
             if (null != resultByte && resultByte.length > 0) {
-                String result = new String(resultByte, "UTF-8");
+                String result = new String(resultByte, StandardCharsets.UTF_8);
                 return JSON.parseObject(result);
             }
-        } catch (NoSuchAlgorithmException | InvalidParameterSpecException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | UnsupportedEncodingException | InvalidKeyException | InvalidAlgorithmParameterException | NoSuchProviderException e) {
+        } catch (NoSuchAlgorithmException | InvalidParameterSpecException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | NoSuchProviderException e) {
             log.error(e.getMessage(), e);
         }
         return null;

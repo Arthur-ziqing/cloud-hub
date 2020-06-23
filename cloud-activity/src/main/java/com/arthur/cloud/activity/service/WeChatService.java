@@ -75,24 +75,4 @@ public class WeChatService {
         return jsonObject;
     }
 
-
-    private void loginOrRegisterConsumer(User user) {
-        User user1 = userService.queryByID(user.getOpenId());
-        if (null == user1) {
-            userService.insert(user);
-        }
-    }
-
-
-    /**
-     * 更新用户信息
-     * @param user 用户信息
-     */
-    public void updateUserInfo(User user){
-        User userExist = userService.queryByID(user.getOpenId());
-        BeanUtils.copyProperties(user,userExist);
-        userService.updateByID(userExist);
-    }
-
-
 }

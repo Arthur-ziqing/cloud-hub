@@ -62,14 +62,14 @@ public class JWTUtil {
      * 生成签名
      *
      * @param openId  openId
-     * @param nickName     用户昵称
+     * @param sessionKey     唯一码
      * @return 加密的token
      */
-    public static String sign(String openId, String nickName) {
+    public static String sign(String openId, String sessionKey) {
 
         try {
             Date date = new Date(System.currentTimeMillis() + EXPIRE_TIME);
-            Algorithm algorithm = Algorithm.HMAC256(nickName);
+            Algorithm algorithm = Algorithm.HMAC256(sessionKey);
             // 附带username信息
             return JWT.create()
                     .withClaim("openId", openId)
