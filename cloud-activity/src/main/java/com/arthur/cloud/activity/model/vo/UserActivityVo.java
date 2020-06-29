@@ -3,6 +3,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @Author 秦梓青
@@ -48,11 +49,6 @@ public class UserActivityVo implements Serializable {
     private Integer joinCount;
 
     /**
-     * 品牌id
-     */
-    private Long brandId;
-
-    /**
      * 开奖时间
      */
     private Date openTime;
@@ -77,5 +73,10 @@ public class UserActivityVo implements Serializable {
      * 品牌名称
      */
     private String brandName;
+
+    /**
+     * 奖品列表
+     */
+    private List<PrizeLevelVo> prizeLevel;
 
 }

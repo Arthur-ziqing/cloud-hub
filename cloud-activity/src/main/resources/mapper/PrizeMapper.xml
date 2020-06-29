@@ -17,5 +17,9 @@
   <delete id="deleteByActivityId">
     delete from prize where activityId = #{activityId}
   </delete>
+    <select id="queryPrizeLevelByActivity" resultType="com.arthur.cloud.activity.model.vo.PrizeLevelVo">
+        select levelName,levelPrize,inviteName,invitePrize from prize where activityId = #{activityId}
+    </select>
+
 
 </mapper>

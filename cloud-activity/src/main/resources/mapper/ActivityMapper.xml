@@ -11,7 +11,6 @@
     <result column="coverImages" jdbcType="VARCHAR" property="coverImages" />
     <result column="images" jdbcType="VARCHAR" property="images" />
     <result column="shareImage" jdbcType="VARCHAR" property="shareImage" />
-    <result column="joinCount" jdbcType="INTEGER" property="joinCount" />
     <result column="brandId" jdbcType="BIGINT" property="brandId" />
     <result column="openTime" jdbcType="TIMESTAMP" property="openTime" />
     <result column="luckyPrizeNum" jdbcType="BIGINT" property="luckyPrizeNum" />

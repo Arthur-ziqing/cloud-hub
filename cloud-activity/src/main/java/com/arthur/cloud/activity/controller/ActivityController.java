@@ -43,11 +43,11 @@ public class ActivityController {
 
     @ApiOperation(value = "活动数据接入更新", httpMethod = "POST", notes = "活动数据接入更新")
     @PostMapping("/saveOrUpdate")
-    public CommonResult save(ActivityVo activityVo){
+    public CommonResult save(@RequestBody ActivityVo activityVo) {
         try {
             activityService.saveOrUpdate(activityVo);
-        }catch (Exception e){
-            logger.info("error",e);
+        } catch (Exception e) {
+            logger.info("error", e);
             return new CommonResult("操作失败");
         }
         return new CommonResult();
@@ -57,21 +57,21 @@ public class ActivityController {
     @ApiOperation(value = "活动列表分页查询", httpMethod = "GET", notes = "活动列表分页查询")
     @GetMapping("/queryByPage")
     @RequiresAuthentication
-    public CommonResult queryByPage(PageCondition pageCondition){
+    public CommonResult queryByPage(PageCondition pageCondition) {
         PageAjax<Activity> pageAjax = new PageAjax<>();
-        BeanUtils.copyProperties(pageCondition,pageAjax);
+        BeanUtils.copyProperties(pageCondition, pageAjax);
         Example example = new Example(Activity.class);
-        pageAjax = activityService.queryByPage(pageAjax,example);
+        pageAjax = activityService.queryByPage(pageAjax, example);
         return new CommonResult(pageAjax);
     }
 
     @ApiOperation(value = "活动删除", notes = "活动删除")
     @DeleteMapping("{id}")
-    public CommonResult delete(@PathVariable Long id){
+    public CommonResult delete(@PathVariable Long id) {
         try {
             activityService.delete(id);
-        }catch (Exception e){
-            logger.info("error",e);
+        } catch (Exception e) {
+            logger.info("error", e);
             return new CommonResult("操作失败");
         }
         return new CommonResult();
@@ -83,11 +83,11 @@ public class ActivityController {
         CommonResult result = new CommonResult();
         try {
             User users = JWTUtil.getToken(request);
-            PageAjax<UserActivityVo> pageAjax = activityService.queryPageByType(condition,users.getOpenId());
+            PageAjax<UserActivityVo> pageAjax = activityService.queryPageByType(condition, users.getOpenId());
             result.setData(pageAjax);
             return result;
-        }catch (BusinessException e){
-            logger.info("error",e);
+        } catch (BusinessException e) {
+            logger.info("error", e);
             result.setHasError(true);
             result.setMsg(e.getMessageKey());
             result.setCode(e.getErrorCode());

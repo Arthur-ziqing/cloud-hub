@@ -12,6 +12,7 @@ import com.arthur.cloud.activity.model.condition.UserActivityCondition;
 import com.arthur.cloud.activity.model.enums.ActivityEnums;
 import com.arthur.cloud.activity.model.enums.UserActivityEnum;
 import com.arthur.cloud.activity.model.vo.ActivityVo;
+import com.arthur.cloud.activity.model.vo.PrizeLevelVo;
 import com.arthur.cloud.activity.model.vo.PrizeVo;
 import com.arthur.cloud.activity.model.vo.UserActivityVo;
 import com.arthur.cloud.activity.util.PageAjax;
@@ -130,6 +131,8 @@ public class ActivityService extends BaseService<Activity> {
                     vo.setWin(false);
                     vo.setJoin(true);
                 }
+                List<PrizeLevelVo> levelVos = prizeMapper.queryPrizeLevelByActivity(item.getId());
+                vo.setPrizeLevel(levelVos.isEmpty() ? null : levelVos);
                 if (item.getBrandId() != null) {
                     Brand brand = new Brand();
                     brand.setId(item.getBrandId());

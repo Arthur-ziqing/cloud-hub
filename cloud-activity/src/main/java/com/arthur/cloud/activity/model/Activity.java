@@ -47,12 +47,6 @@ public class Activity implements Serializable {
     private String shareImage;
 
     /**
-     * 参加人数
-     */
-    @Column(name = "joinCount")
-    private Integer joinCount;
-
-    /**
      * 品牌id
      */
     @Column(name = "brandId")

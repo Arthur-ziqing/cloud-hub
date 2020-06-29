@@ -7,7 +7,6 @@ import com.arthur.cloud.activity.model.vo.BrandVo;
 import com.arthur.cloud.activity.service.BrandService;
 import com.arthur.cloud.activity.util.CommonResult;
 import com.arthur.cloud.activity.util.PageAjax;
-import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +37,7 @@ public class BrandController {
 
     @ApiOperation(value = "品牌数据接入更新", httpMethod = "POST", notes = "品牌数据接入更新")
     @PostMapping(value = "/saveOrUpdate")
-    public CommonResult save(@ModelAttribute BrandVo brandVo) {
+    public CommonResult save(@RequestBody BrandVo brandVo) {
         logger.info(" 品牌数据接入开始");
         logger.info("品牌数据为=" + brandVo.toString());
         Brand brand = new Brand();
