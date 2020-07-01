@@ -28,6 +28,8 @@ public class UJoinA implements Serializable {
     /**
      * 中奖号码
      */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long number;
 
     public UJoinA() {

@@ -25,10 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -131,6 +128,9 @@ public class ActivityService extends BaseService<Activity> {
                     vo.setWin(false);
                     vo.setJoin(true);
                 }
+                UJoinA uJoinA = new UJoinA();
+                uJoinA.setActivityId(item.getId());
+                vo.setJoinCount(uJoinAMapper.selectCount(uJoinA));
                 List<PrizeLevelVo> levelVos = prizeMapper.queryPrizeLevelByActivity(item.getId());
                 vo.setPrizeLevel(levelVos.isEmpty() ? null : levelVos);
                 if (item.getBrandId() != null) {
@@ -187,5 +187,6 @@ public class ActivityService extends BaseService<Activity> {
         pageAjax.setTotal(count);
         return pageAjax;
     }
+
 
 }

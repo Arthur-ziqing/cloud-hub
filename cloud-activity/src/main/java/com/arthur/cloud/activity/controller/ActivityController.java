@@ -2,6 +2,7 @@ package com.arthur.cloud.activity.controller;
 
 import com.arthur.cloud.activity.exception.BusinessException;
 import com.arthur.cloud.activity.model.Activity;
+import com.arthur.cloud.activity.model.UJoinA;
 import com.arthur.cloud.activity.model.User;
 import com.arthur.cloud.activity.model.condition.PageCondition;
 import com.arthur.cloud.activity.model.condition.UserActivityCondition;
@@ -9,11 +10,11 @@ import com.arthur.cloud.activity.model.vo.ActivityVo;
 import com.arthur.cloud.activity.model.vo.UserActivityVo;
 import com.arthur.cloud.activity.service.ActivityService;
 import com.arthur.cloud.activity.service.PrizeService;
+import com.arthur.cloud.activity.service.UJoinAService;
 import com.arthur.cloud.activity.util.CommonResult;
 import com.arthur.cloud.activity.util.JWTUtil;
 import com.arthur.cloud.activity.util.PageAjax;
 import io.swagger.annotations.ApiOperation;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -40,6 +41,9 @@ public class ActivityController {
     @Resource
     private ActivityService activityService;
 
+    @Resource
+    private UJoinAService uJoinAService;
+
 
     @ApiOperation(value = "活动数据接入更新", httpMethod = "POST", notes = "活动数据接入更新")
     @PostMapping("/saveOrUpdate")
@@ -56,7 +60,6 @@ public class ActivityController {
 
     @ApiOperation(value = "活动列表分页查询", httpMethod = "GET", notes = "活动列表分页查询")
     @GetMapping("/queryByPage")
-    @RequiresAuthentication
     public CommonResult queryByPage(PageCondition pageCondition) {
         PageAjax<Activity> pageAjax = new PageAjax<>();
         BeanUtils.copyProperties(pageCondition, pageAjax);
@@ -94,5 +97,22 @@ public class ActivityController {
             return result;
         }
     }
+
+    @ApiOperation(value = "参与活动", httpMethod = "GET", notes = "参与活动")
+    @GetMapping("/join/{id}")
+    public CommonResult joinActivity(@PathVariable Long id, HttpServletRequest request){
+        CommonResult result = new CommonResult();
+        try {
+            User users = JWTUtil.getToken(request);
+            UJoinA uJoinA = new UJoinA(users.getOpenId(),id);
+            uJoinAService.insert(uJoinA);
+            return result;
+        } catch (BusinessException e) {
+            logger.info("error", e);
+            return new CommonResult(true,e.getMessageKey(),e.getErrorCode());
+        }
+    }
+
+
 
 }
