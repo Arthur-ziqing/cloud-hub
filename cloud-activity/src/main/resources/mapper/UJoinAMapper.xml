@@ -8,5 +8,6 @@
     <result column="openid" jdbcType="VARCHAR" property="openid" />
     <result column="activityId" jdbcType="BIGINT" property="activityId" />
     <result column="number" jdbcType="BIGINT" property="number" />
+    <result column="isWinLuck" jdbcType="BIT" property="isWinLuck"/>
   </resultMap>
 </mapper>

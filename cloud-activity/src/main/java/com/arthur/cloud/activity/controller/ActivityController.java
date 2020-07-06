@@ -6,6 +6,7 @@ import com.arthur.cloud.activity.model.UJoinA;
 import com.arthur.cloud.activity.model.User;
 import com.arthur.cloud.activity.model.condition.PageCondition;
 import com.arthur.cloud.activity.model.condition.UserActivityCondition;
+import com.arthur.cloud.activity.model.vo.ActivityOpenPrizeVo;
 import com.arthur.cloud.activity.model.vo.ActivityVo;
 import com.arthur.cloud.activity.model.vo.UserActivityVo;
 import com.arthur.cloud.activity.service.ActivityService;
@@ -106,6 +107,22 @@ public class ActivityController {
             User users = JWTUtil.getToken(request);
             UJoinA uJoinA = new UJoinA(users.getOpenId(),id);
             uJoinAService.insert(uJoinA);
+            return result;
+        } catch (BusinessException e) {
+            logger.info("error", e);
+            return new CommonResult(true,e.getMessageKey(),e.getErrorCode());
+        }
+    }
+
+
+    @ApiOperation(value = "活动开奖", httpMethod = "GET", notes = "活动开奖")
+    @GetMapping("/opening/{id}")
+    public CommonResult openPrize(@PathVariable Long id, HttpServletRequest request){
+        CommonResult result = new CommonResult();
+        try {
+            User users = JWTUtil.getToken(request);
+            ActivityOpenPrizeVo winInfo =  activityService.openPrize(id,users.getOpenId());
+            result.setData(winInfo);
             return result;
         } catch (BusinessException e) {
             logger.info("error", e);

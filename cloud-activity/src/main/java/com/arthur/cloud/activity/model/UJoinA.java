@@ -32,6 +32,11 @@ public class UJoinA implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long number;
 
+    /**
+     * 是否中幸运奖
+     */
+    private boolean isWinLuck;
+
     public UJoinA() {
     }
 

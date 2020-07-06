@@ -4,17 +4,12 @@ import com.arthur.cloud.activity.mapper.ActivityMapper;
 import com.arthur.cloud.activity.mapper.BrandMapper;
 import com.arthur.cloud.activity.mapper.PrizeMapper;
 import com.arthur.cloud.activity.mapper.UJoinAMapper;
-import com.arthur.cloud.activity.model.Activity;
-import com.arthur.cloud.activity.model.Brand;
-import com.arthur.cloud.activity.model.Prize;
-import com.arthur.cloud.activity.model.UJoinA;
+import com.arthur.cloud.activity.model.*;
 import com.arthur.cloud.activity.model.condition.UserActivityCondition;
 import com.arthur.cloud.activity.model.enums.ActivityEnums;
+import com.arthur.cloud.activity.model.enums.PrizeEnums;
 import com.arthur.cloud.activity.model.enums.UserActivityEnum;
-import com.arthur.cloud.activity.model.vo.ActivityVo;
-import com.arthur.cloud.activity.model.vo.PrizeLevelVo;
-import com.arthur.cloud.activity.model.vo.PrizeVo;
-import com.arthur.cloud.activity.model.vo.UserActivityVo;
+import com.arthur.cloud.activity.model.vo.*;
 import com.arthur.cloud.activity.util.PageAjax;
 import org.apache.ibatis.session.RowBounds;
 import org.slf4j.Logger;
@@ -55,6 +50,9 @@ public class ActivityService extends BaseService<Activity> {
 
     @Resource
     private BrandMapper brandMapper;
+
+    @Resource
+    private UserService userService;
 
 
     public void saveOrUpdate(ActivityVo vo) {
@@ -188,5 +186,128 @@ public class ActivityService extends BaseService<Activity> {
         return pageAjax;
     }
 
+
+    /**
+     * 活动开奖
+     * @return 返回活动获奖名单
+     */
+    public ActivityOpenPrizeVo openPrize(Long id, String openId){
+
+
+        //获取所有参与用户的参与号码
+        UJoinA uJoinA = new UJoinA();
+        uJoinA.setActivityId(id);
+        List<UJoinA> uJoinAList = uJoinAMapper.select(uJoinA);
+
+        //获取当前活动所有的奖项
+        Prize prize = new Prize();
+        prize.setActivityId(id);
+        List<Prize> prizes = prizeMapper.select(prize);
+
+        //获取活动信息
+        Activity activity = new Activity();
+        activity.setId(id);
+        activity = activityMapper.selectByPrimaryKey(id);
+
+        //随机抽取以活动奖项为数量的号码
+        List<UJoinA> win = prizeDraw(uJoinAList, (long) prizes.size());
+
+
+        //用于判断当前用户是否中活动奖项
+        boolean isWin = false;
+        boolean isInivte =false;
+        //将活动奖项获奖名单数据封装并更新奖项中奖号码
+        List<WinPrizeVo> wins = new ArrayList<>();
+        for (int i = 0; i < win.size(); i++) {
+            UJoinA u = win.get(i);
+            Prize p = prizes.get(i);
+            WinPrizeVo winPrizeVo = new WinPrizeVo();
+            winPrizeVo.setNum(u.getNumber());
+            winPrizeVo.setPrizeType(PrizeEnums.ACITICITY);
+            winPrizeVo.setPrizeLevelName(p.getLevelName());
+            winPrizeVo.setPrizeName(p.getLevelPrize());
+
+            isWin = u.getOpenid().equals(openId);
+            User user = new User();
+            user.setOpenId(u.getOpenid());
+            user = userService.getUser(user);
+            winPrizeVo.setNickName(user.getNickname());
+            winPrizeVo.setAvatarUrl(user.getAvatarUrl());
+
+
+            wins.add(winPrizeVo);
+
+            //判断是否被邀请，如果是被邀请，及给到邀请者一个邀请奖
+            if(null != user.getInviteOpenId()){
+                isInivte = user.getInviteOpenId().equals(openId);
+                user.setOpenId(user.getInviteOpenId());
+                user = userService.getUser(user);
+                //获取邀请奖获取者
+                WinPrizeVo invite = new WinPrizeVo();
+                invite.setPrizeLevelName(p.getInviteName());
+                invite.setPrizeName(p.getInvitePrize());
+                invite.setAvatarUrl(user.getAvatarUrl());
+                invite.setNickName(user.getNickname());
+                invite.setPrizeType(PrizeEnums.INVITE);
+                wins.add(invite);
+            }
+
+            //更新活动奖项中奖号码
+            p.setNum(u.getNumber());
+            prizeMapper.updateByPrimaryKey(p);
+        }
+
+
+
+
+        List<UJoinA> luck = prizeDraw(uJoinAList,activity.getLuckyNumber());
+
+
+        boolean isLuck = false;
+        //幸运奖
+        List<WinPrizeVo> luckWins = new ArrayList<>();
+        for (UJoinA item : luck) {
+            WinPrizeVo winPrizeVo = new WinPrizeVo();
+            winPrizeVo.setNum(item.getNumber());
+            winPrizeVo.setPrizeType(PrizeEnums.LUCK);
+            winPrizeVo.setPrizeName(activity.getLuckyPrizeName());
+
+            isLuck = item.getOpenid().equals(openId);
+            User user = new User();
+            user.setOpenId(item.getOpenid());
+            user = userService.getUser(user);
+
+            winPrizeVo.setNickName(user.getNickname());
+            winPrizeVo.setAvatarUrl(user.getAvatarUrl());
+            item.setWinLuck(true);
+            luckWins.add(winPrizeVo);
+            uJoinAMapper.updateByPrimaryKey(item);
+        }
+
+        ActivityOpenPrizeVo winInfo = new ActivityOpenPrizeVo();
+        winInfo.setWin(isWin || isInivte || isLuck);
+        winInfo.setWins(wins);
+        winInfo.setLuckWins(luckWins);
+        return  new ActivityOpenPrizeVo();
+    }
+
+    /**
+     * 抽奖
+     * @param list 参与者
+     * @param n 抽奖次数
+     * @return 获奖
+     */
+    private List<UJoinA> prizeDraw(List<UJoinA> list, Long n){
+        List<UJoinA> winNum = new ArrayList<>();
+        for (int i = 1; i <= n ; i++) {
+            Random random = new Random();
+            int index = random.nextInt(list.size());
+            list.get(index);
+            winNum.add(list.get(index));
+            list.remove(index);
+        }
+        return  winNum;
+
+    }
 
 }
