@@ -210,7 +210,7 @@ public class ActivityService extends BaseService<Activity> {
         activity = activityMapper.selectByPrimaryKey(id);
 
         //随机抽取以活动奖项为数量的号码
-        List<UJoinA> win = prizeDraw(uJoinAList, (long) prizes.size());
+        List<UJoinA> win = uJoinAList.isEmpty() ? new ArrayList<>() : prizeDraw(uJoinAList, (long) prizes.size());
 
 
         //用于判断当前用户是否中活动奖项
@@ -255,12 +255,13 @@ public class ActivityService extends BaseService<Activity> {
             //更新活动奖项中奖号码
             p.setNum(u.getNumber());
             prizeMapper.updateByPrimaryKey(p);
+            uJoinAList.remove(u);
         }
 
 
 
 
-        List<UJoinA> luck = prizeDraw(uJoinAList,activity.getLuckyNumber());
+        List<UJoinA> luck = uJoinAList.isEmpty() ? new ArrayList<>() :prizeDraw(uJoinAList,activity.getLuckyNumber());
 
 
         boolean isLuck = false;
@@ -288,7 +289,7 @@ public class ActivityService extends BaseService<Activity> {
         winInfo.setWin(isWin || isInivte || isLuck);
         winInfo.setWins(wins);
         winInfo.setLuckWins(luckWins);
-        return  new ActivityOpenPrizeVo();
+        return  winInfo;
     }
 
     /**
