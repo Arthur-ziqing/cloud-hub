@@ -24,6 +24,7 @@ import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @Author 秦梓青
@@ -106,7 +107,12 @@ public class ActivityController {
         try {
             User users = JWTUtil.getToken(request);
             UJoinA uJoinA = new UJoinA(users.getOpenId(),id);
-            uJoinAService.insert(uJoinA);
+            List<UJoinA> uJoinAList = uJoinAService.queryList(uJoinA);
+            if (uJoinAList.size() > 10) {
+                result.setHasError(true);
+            } else {
+                uJoinAService.insert(uJoinA);
+            }
             return result;
         } catch (BusinessException e) {
             logger.info("error", e);
