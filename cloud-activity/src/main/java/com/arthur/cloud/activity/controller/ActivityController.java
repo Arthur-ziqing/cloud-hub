@@ -4,6 +4,7 @@ import com.arthur.cloud.activity.exception.BusinessException;
 import com.arthur.cloud.activity.model.Activity;
 import com.arthur.cloud.activity.model.UJoinA;
 import com.arthur.cloud.activity.model.User;
+import com.arthur.cloud.activity.model.condition.ActivityCondition;
 import com.arthur.cloud.activity.model.condition.PageCondition;
 import com.arthur.cloud.activity.model.condition.UserActivityCondition;
 import com.arthur.cloud.activity.model.vo.ActivityOpenPrizeVo;
@@ -85,6 +86,7 @@ public class ActivityController {
     @ApiOperation(value = "用户端活动分页", httpMethod = "GET", notes = "用户端活动分页")
     @GetMapping("/appPage")
     public CommonResult queryByPageAndType(UserActivityCondition condition, HttpServletRequest request) {
+        logger.info("用户端活动分页调用" + condition.toString());
         CommonResult result = new CommonResult();
         try {
             User users = JWTUtil.getToken(request);
@@ -112,6 +114,7 @@ public class ActivityController {
                 result.setHasError(true);
             } else {
                 uJoinAService.insert(uJoinA);
+                result.setData(uJoinAService.countJoin(id));
             }
             return result;
         } catch (BusinessException e) {
@@ -136,6 +139,44 @@ public class ActivityController {
         }
     }
 
+
+
+    @ApiOperation(value = "推荐活动", httpMethod = "GET", notes = "推荐活动")
+    @GetMapping("/recommend")
+    public CommonResult recommend(HttpServletRequest request) {
+        CommonResult result = new CommonResult();
+        try {
+            User users = JWTUtil.getToken(request);
+            List<Activity> activities = activityService.recommend(users.getOpenId());
+            result.setData(activities);
+            return result;
+        } catch (BusinessException e) {
+            logger.info("error", e);
+            result.setHasError(true);
+            result.setMsg(e.getMessageKey());
+            result.setCode(e.getErrorCode());
+            return result;
+        }
+    }
+
+
+    @ApiOperation(value = "我参与的活动", httpMethod = "GET", notes = "我参与的活动")
+    @GetMapping("/query")
+    public CommonResult queryByPageAndOpenId(ActivityCondition condition, HttpServletRequest request) {
+        CommonResult result = new CommonResult();
+        try {
+            User users = JWTUtil.getToken(request);
+            PageAjax<Activity> pageAjax = activityService.queryJoin(condition, users.getOpenId());
+            result.setData(pageAjax);
+            return result;
+        } catch (BusinessException e) {
+            logger.info("error", e);
+            result.setHasError(true);
+            result.setMsg(e.getMessageKey());
+            result.setCode(e.getErrorCode());
+            return result;
+        }
+    }
 
 
 }

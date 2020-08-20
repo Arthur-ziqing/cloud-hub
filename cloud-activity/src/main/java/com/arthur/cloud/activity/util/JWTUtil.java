@@ -1,5 +1,6 @@
 package com.arthur.cloud.activity.util;
 
+import com.arthur.cloud.activity.controller.WebController;
 import com.arthur.cloud.activity.exception.BusinessException;
 import com.arthur.cloud.activity.model.User;
 import com.auth0.jwt.JWT;
@@ -7,6 +8,8 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
@@ -21,6 +24,8 @@ public class JWTUtil {
      * 过期时间设置为20年
      */
     private static final long EXPIRE_TIME = 20 * 365 * 24 * 3600000;
+
+    private static final Logger logger = LoggerFactory.getLogger(JWTUtil.class);
 
     /**
      * 校验token是否正确
@@ -98,9 +103,9 @@ public class JWTUtil {
         if (openId == null ) {
             throw new BusinessException("token 失效","9998");
         }
+        logger.info("当前用户openId为：" + openId);
         User users = new User();
         users.setOpenId(openId);
-
         return users;
     }
 }

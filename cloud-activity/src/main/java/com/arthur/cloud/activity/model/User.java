@@ -1,5 +1,6 @@
 package com.arthur.cloud.activity.model;
 
+import io.swagger.annotations.ApiModel;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -8,6 +9,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Data
+@ApiModel
 public class User implements Serializable {
 
     private static final long serialVersionUID = -4900248123286980845L;

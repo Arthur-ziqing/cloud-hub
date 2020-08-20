@@ -35,6 +35,7 @@ public class UJoinA implements Serializable {
     /**
      * 是否中幸运奖
      */
+    @Column(name = "activityId")
     private boolean isWinLuck;
 
     public UJoinA() {

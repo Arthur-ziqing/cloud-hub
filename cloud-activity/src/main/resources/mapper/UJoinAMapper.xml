@@ -10,4 +10,8 @@
     <result column="number" jdbcType="BIGINT" property="number" />
     <result column="isWinLuck" jdbcType="BIT" property="isWinLuck"/>
   </resultMap>
+    <select id="countJoin" resultType="java.lang.Integer">
+     select count(1) from (select DISTINCT openid from u_join_a where activityId = #{activityId}) a
+    </select>
+
 </mapper>

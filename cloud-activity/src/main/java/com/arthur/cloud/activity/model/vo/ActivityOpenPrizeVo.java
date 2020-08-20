@@ -1,6 +1,5 @@
 package com.arthur.cloud.activity.model.vo;
 
-import com.arthur.cloud.activity.model.Prize;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -21,6 +20,11 @@ public class ActivityOpenPrizeVo implements Serializable {
      * 是否中奖
      */
     private boolean isWin;
+
+    /**
+     * 中奖信息
+     */
+    private WinPrizeVo winPrize;
 
     /**
      * 活动中奖者

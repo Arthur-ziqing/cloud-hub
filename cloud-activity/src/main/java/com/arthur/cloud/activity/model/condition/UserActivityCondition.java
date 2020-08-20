@@ -1,5 +1,6 @@
 package com.arthur.cloud.activity.model.condition;
 
+import com.arthur.cloud.activity.model.enums.ActivityEnums;
 import com.arthur.cloud.activity.model.enums.UserActivityEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -25,4 +26,5 @@ public class UserActivityCondition extends PageCondition{
     public void setType(UserActivityEnum type) {
         this.type = type;
     }
+
 }

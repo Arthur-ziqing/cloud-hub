@@ -18,4 +18,11 @@
     <result column="createTime" jdbcType="TIMESTAMP" property="createTime" />
     <result column="updateTime" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
+    <select id="queryByInviteId" resultType="com.arthur.cloud.activity.model.vo.UserVo">
+      select nickname,avatarUrl,createtime from user  where inviteOpenId = #{inviteOpenId} limit ${condition.start},${condition.limit}
+    </select>
+
+  <select id="queryByInviteIdCount" resultType="java.lang.Integer">
+      select count(*) from user  where inviteOpenId = #{inviteOpenId}
+    </select>
 </mapper>

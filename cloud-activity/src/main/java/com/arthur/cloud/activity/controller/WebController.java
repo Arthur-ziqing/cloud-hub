@@ -1,9 +1,10 @@
 package com.arthur.cloud.activity.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.arthur.cloud.activity.exception.BusinessException;
 import com.arthur.cloud.activity.model.User;
+import com.arthur.cloud.activity.model.condition.PageCondition;
+import com.arthur.cloud.activity.model.vo.UserVo;
 import com.arthur.cloud.activity.service.UserService;
 import com.arthur.cloud.activity.service.WeChatService;
 import com.arthur.cloud.activity.util.*;
@@ -11,12 +12,14 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @CrossOrigin
@@ -40,9 +43,9 @@ public class WebController {
     @ResponseBody
     @GetMapping("/login")
     public CommonResult doLogin(@ApiParam(required = true, value = "临时登录凭证code", name = "code")
-                                       @RequestParam(value = "code") String code,
-                                       @ApiParam(value = "邀请人code", name = "inviteCode")
-                                       @RequestParam(value = "inviteCode",required = false)String inviteCode) {
+                                @RequestParam(value = "code") String code,
+                                @ApiParam(value = "邀请人code", name = "inviteCode")
+                                @RequestParam(value = "inviteCode", required = false) String inviteCode) {
         logger.info("Start get SessionKey");
         Map<String, Object> map = new HashMap<String, Object>();
         JSONObject sessionKeyOpenId = weChatService.getWxSession(code);
@@ -96,40 +99,26 @@ public class WebController {
 
     @ApiOperation(value = "获取用户信息", httpMethod = "POST", notes = "获取用户信息")
     @PostMapping(value = "updateInfo")
-    public CommonResult autoLogin(HttpServletRequest request,
-            @ApiParam(required = true, value = "用户信息", name = "rawData")
-            @RequestParam(value = "rawData", required = true) String rawData) {
+    public CommonResult autoLogin(HttpServletRequest request, @RequestBody User rawData) {
 
         CommonResult result;
-        logger.info("用户非敏感信息" + rawData);
-        JSONObject rawDataJson = JSON.parseObject(rawData);
+        logger.info("用户非敏感信息" + rawData.toString());
         User user;
         try {
             user = JWTUtil.getToken(request);
         } catch (BusinessException e) {
-            logger.info("error",e);
-            result = new CommonResult(e.getErrorCode(),e.getMessage());
+            logger.info("error", e);
+            result = new CommonResult(e.getErrorCode(), e.getMessage());
             result.setHasError(true);
             return result;
         }
+        String openId = user.getOpenId();
+        logger.info("当前登录openID" + user.getOpenId());
         user = userService.getUser(user);
         //入库
-        String nickName = rawDataJson.getString("nickName");
-        String avatarUrl = rawDataJson.getString("avatarUrl");
-        String gender = rawDataJson.getString("gender");
-        String city = rawDataJson.getString("city");
-        String country = rawDataJson.getString("country");
-        String province = rawDataJson.getString("province");
-        String language = rawDataJson.getString("language");
-
-        user.setNickname(nickName);
-        user.setCountry(country);
-        user.setCity(city);
-        user.setProvince(province);
-        user.setAvatarUrl(avatarUrl);
-        user.setGender(Integer.parseInt(gender));
+        BeanUtils.copyProperties(rawData, user);
+        user.setOpenId(openId);
         user.setUpdateTime(new Date());
-        user.setLanguage(language);
         return userService.update(user);
     }
 
@@ -178,5 +167,30 @@ public class WebController {
 
         return new CommonResult(true, "Unauthorized", null);
     }*/
+
+
+
+
+    /**
+     * 获取当前登录用户
+     *
+     * @return 当前登录用户
+     */
+    @ApiOperation(value = "获取用户信息", httpMethod = "GET", notes = "获取用户信息")
+    @GetMapping(value = "inviteUser")
+    public CommonResult in(HttpServletRequest request, PageCondition pageCondition) {
+
+        try {
+
+            User users = JWTUtil.getToken(request);
+            PageAjax<UserVo> userList = userService.queryByInviteId(pageCondition, users.getOpenId());
+            return new CommonResult(false, "Login success", userList);
+        } catch (Exception e) {
+
+            return new CommonResult(true, "Login error", null);
+        }
+
+    }
+
 
 }

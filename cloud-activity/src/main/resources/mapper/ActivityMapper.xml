@@ -23,10 +23,14 @@
   </resultMap>
 
   <select id="queryJoin" resultType="com.arthur.cloud.activity.model.Activity">
-     select a.* from activity a left join u_join_a b on a.id = b.activityId where b.openid = #{openId} and type = 'PROGRESS' limit ${start},${limit}
+     select a.* from activity a where a.id  in (select activityId from u_join_a where openid = #{openId} group by activityId) and a.type = #{type} order by createTime desc  limit ${start},${limit}
   </select>
 
   <select id="queryJoinCount" resultType="java.lang.Integer">
-    select count(1) from activity a left join u_join_a b on a.id = b.activityId where b.openid = #{openId} and type = 'PROGRESS'
+    select count(1) from activity a where a.id  in (select activityId from u_join_a where openid = #{openId} group by activityId) and a.type = #{type}
+  </select>
+
+  <select id="recommend" resultType="com.arthur.cloud.activity.model.Activity">
+    select * from activity a where a.id not in (select activityId from u_join_a where openid = #{openId} group by activityId) and a.type = 'PROGRESS' and  a.openTime > now()  limit 2
   </select>
 </mapper>

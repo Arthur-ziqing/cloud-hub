@@ -5,6 +5,7 @@ import com.arthur.cloud.activity.mapper.BrandMapper;
 import com.arthur.cloud.activity.mapper.PrizeMapper;
 import com.arthur.cloud.activity.mapper.UJoinAMapper;
 import com.arthur.cloud.activity.model.*;
+import com.arthur.cloud.activity.model.condition.ActivityCondition;
 import com.arthur.cloud.activity.model.condition.UserActivityCondition;
 import com.arthur.cloud.activity.model.enums.ActivityEnums;
 import com.arthur.cloud.activity.model.enums.PrizeEnums;
@@ -99,7 +100,10 @@ public class ActivityService extends BaseService<Activity> {
         if (!UserActivityEnum.JOIN.equals(condition.getType())) {
             list = queryNoJoin(condition);
         } else {
-            list = queryJoin(condition, openId);
+            ActivityCondition activityCondition = new ActivityCondition();
+            BeanUtils.copyProperties(condition,activityCondition);
+            activityCondition.setActivityType(ActivityEnums.PROGRESS);
+            list = queryJoin(activityCondition, openId);
         }
         List<UserActivityVo> userActivityVos = new ArrayList<>();
         BeanUtils.copyProperties(list, pageAjax);
@@ -109,14 +113,15 @@ public class ActivityService extends BaseService<Activity> {
                 BeanUtils.copyProperties(item, vo);
                 if (!UserActivityEnum.JOIN.equals(condition.getType())) {
                     UJoinA uJoinA = new UJoinA(openId, item.getId());
-                    uJoinA = uJoinAMapper.selectOne(uJoinA);
-                    if (uJoinA != null && item.getType().equals(ActivityEnums.FINISH.toString())) {
-                        Long num = uJoinA.getNumber();
+                    List<UJoinA> uJoinAS = uJoinAMapper.select(uJoinA);
+                    if (!uJoinAS.isEmpty() && item.getType().equals(ActivityEnums.FINISH.toString())) {
                         vo.setJoin(true);
                         Prize prize = new Prize();
                         prize.setActivityId(item.getId());
                         List<Prize> prizes = prizeMapper.select(prize);
-                        prizes = prizes.stream().filter(p -> p.getNum().equals(num)).collect(Collectors.toList());
+                        for (UJoinA u : uJoinAS) {
+                            prizes = prizes.stream().filter(p -> p.getNum().equals(u.getNumber())).collect(Collectors.toList());
+                        }
                         vo.setWin(!prizes.isEmpty());
                     } else {
                         vo.setJoin(false);
@@ -126,9 +131,7 @@ public class ActivityService extends BaseService<Activity> {
                     vo.setWin(false);
                     vo.setJoin(true);
                 }
-                UJoinA uJoinA = new UJoinA();
-                uJoinA.setActivityId(item.getId());
-                vo.setJoinCount(uJoinAMapper.selectCount(uJoinA));
+                vo.setJoinCount(uJoinAMapper.countJoin(item.getId()));
                 List<PrizeLevelVo> levelVos = prizeMapper.queryPrizeLevelByActivity(item.getId());
                 vo.setPrizeLevel(levelVos.isEmpty() ? null : levelVos);
                 if (item.getBrandId() != null) {
@@ -148,6 +151,7 @@ public class ActivityService extends BaseService<Activity> {
     }
 
 
+
     /**
      * 查询不是我参加的活动
      *
@@ -158,9 +162,10 @@ public class ActivityService extends BaseService<Activity> {
         PageAjax<Activity> pageAjax = new PageAjax<>();
         BeanUtils.copyProperties(condition, pageAjax);
         Activity activity = new Activity();
-        activity.setType(UserActivityEnum.FINISH.equals(condition.getType()) ? ActivityEnums.FINISH.toString() : ActivityEnums.PROGRESS.toString());
+        activity.setType(ActivityEnums.PROGRESS.toString());
         int count = activityMapper.selectCount(activity);
         Example example = new Example(Activity.class);
+        example.setOrderByClause("`createTime` desc");
         if (count > 0) {
             pageAjax = activityService.queryByPage(pageAjax, example);
         }
@@ -174,12 +179,12 @@ public class ActivityService extends BaseService<Activity> {
      * @param openId    用户id
      * @return 活动分页
      */
-    public PageAjax<Activity> queryJoin(UserActivityCondition condition, String openId) {
+    public PageAjax<Activity> queryJoin(ActivityCondition condition, String openId) {
         PageAjax<Activity> pageAjax = new PageAjax<>();
-        int count = activityMapper.queryJoinCount(openId);
+        int count = activityMapper.queryJoinCount(openId,condition.getActivityType().toString());
         List<Activity> list = new ArrayList<>();
         if (count > 0) {
-            pageAjax.setList(activityMapper.queryJoin(condition.getStart() * condition.getLimit(), condition.getLimit(), openId));
+            list = activityMapper.queryJoin(condition.getStart() * condition.getLimit(), condition.getLimit(), openId, condition.getActivityType().toString());
         }
         pageAjax.setList(list);
         pageAjax.setTotal(count);
@@ -189,15 +194,21 @@ public class ActivityService extends BaseService<Activity> {
 
     /**
      * 活动开奖
+     *
      * @return 返回活动获奖名单
      */
-    public ActivityOpenPrizeVo openPrize(Long id, String openId){
+    public ActivityOpenPrizeVo openPrize(Long id, String openId) {
 
 
         //获取所有参与用户的参与号码
         UJoinA uJoinA = new UJoinA();
         uJoinA.setActivityId(id);
         List<UJoinA> uJoinAList = uJoinAMapper.select(uJoinA);
+
+        Map<String, List<UJoinA>> map = uJoinAList.stream().collect(Collectors.groupingBy(UJoinA::getOpenid));
+
+        List<UJoinA> openUser  = new ArrayList<>();
+        map.forEach((k, v) -> openUser.addAll(this.prizeDraw(v, (long) 1)));
 
         //获取当前活动所有的奖项
         Prize prize = new Prize();
@@ -210,12 +221,19 @@ public class ActivityService extends BaseService<Activity> {
         activity = activityMapper.selectByPrimaryKey(id);
 
         //随机抽取以活动奖项为数量的号码
-        List<UJoinA> win = uJoinAList.isEmpty() ? new ArrayList<>() : prizeDraw(uJoinAList, (long) prizes.size());
+        List<UJoinA> win = openUser.isEmpty() ? new ArrayList<>() : prizeDraw(openUser, (long) prizes.size());
 
 
         //用于判断当前用户是否中活动奖项
         boolean isWin = false;
-        boolean isInivte =false;
+        boolean isInivte = false;
+
+        WinPrizeVo isWinPrize = new WinPrizeVo();
+        WinPrizeVo isInivtePrize = new WinPrizeVo();
+
+
+
+
         //将活动奖项获奖名单数据封装并更新奖项中奖号码
         List<WinPrizeVo> wins = new ArrayList<>();
         for (int i = 0; i < win.size(); i++) {
@@ -234,11 +252,11 @@ public class ActivityService extends BaseService<Activity> {
             winPrizeVo.setNickName(user.getNickname());
             winPrizeVo.setAvatarUrl(user.getAvatarUrl());
 
-
             wins.add(winPrizeVo);
+            isWinPrize = isWin ? winPrizeVo : new WinPrizeVo();
 
             //判断是否被邀请，如果是被邀请，及给到邀请者一个邀请奖
-            if(null != user.getInviteOpenId()){
+            if (null != user.getInviteOpenId()) {
                 isInivte = user.getInviteOpenId().equals(openId);
                 user.setOpenId(user.getInviteOpenId());
                 user = userService.getUser(user);
@@ -250,21 +268,23 @@ public class ActivityService extends BaseService<Activity> {
                 invite.setNickName(user.getNickname());
                 invite.setPrizeType(PrizeEnums.INVITE);
                 wins.add(invite);
+
+                isInivtePrize = isInivte ? invite : new WinPrizeVo();
             }
 
             //更新活动奖项中奖号码
             p.setNum(u.getNumber());
             prizeMapper.updateByPrimaryKey(p);
-            uJoinAList.remove(u);
+            openUser.remove(u);
         }
 
 
-
-
-        List<UJoinA> luck = uJoinAList.isEmpty() ? new ArrayList<>() :prizeDraw(uJoinAList,activity.getLuckyNumber());
+        List<UJoinA> luck = openUser.isEmpty() ? new ArrayList<>() : this.prizeDraw(openUser, activity.getLuckyNumber());
 
 
         boolean isLuck = false;
+
+        WinPrizeVo isLuckPrize = new WinPrizeVo();
         //幸运奖
         List<WinPrizeVo> luckWins = new ArrayList<>();
         for (UJoinA item : luck) {
@@ -283,32 +303,51 @@ public class ActivityService extends BaseService<Activity> {
             item.setWinLuck(true);
             luckWins.add(winPrizeVo);
             uJoinAMapper.updateByPrimaryKey(item);
+
+            isInivtePrize = isLuck ? winPrizeVo : new WinPrizeVo();
         }
 
         ActivityOpenPrizeVo winInfo = new ActivityOpenPrizeVo();
         winInfo.setWin(isWin || isInivte || isLuck);
+        if (isWin) {
+            winInfo.setWinPrize(isWinPrize);
+        }
+        if (isInivte) {
+            winInfo.setWinPrize(isInivtePrize);
+        }
+        if (isLuck) {
+            winInfo.setWinPrize(isLuckPrize);
+        }
         winInfo.setWins(wins);
         winInfo.setLuckWins(luckWins);
-        return  winInfo;
+        return winInfo;
     }
 
     /**
      * 抽奖
+     *
      * @param list 参与者
-     * @param n 抽奖次数
+     * @param n    抽奖次数
      * @return 获奖
      */
-    private List<UJoinA> prizeDraw(List<UJoinA> list, Long n){
+    public List<UJoinA> prizeDraw(List<UJoinA> list, Long n) {
         List<UJoinA> winNum = new ArrayList<>();
-        for (int i = 1; i <= n ; i++) {
-            Random random = new Random();
-            int index = random.nextInt(list.size());
-            list.get(index);
-            winNum.add(list.get(index));
-            list.remove(index);
+        for (int i = 1; i <= n; i++) {
+            if (!list.isEmpty()) {
+                Random random = new Random();
+                int index = random.nextInt(list.size());
+                list.get(index);
+                winNum.add(list.get(index));
+                list.remove(index);
+            }
         }
-        return  winNum;
+        return winNum;
 
     }
+
+    public List<Activity> recommend(String openId){
+        return activityMapper.recommend(openId);
+    }
+
 
 }

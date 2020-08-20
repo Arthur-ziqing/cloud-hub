@@ -18,11 +18,18 @@ public interface ActivityMapper extends MyMapper<Activity> {
      * @param openId 用户
      * @return 我参与的活动列表
      */
-    List<Activity> queryJoin(@Param("start") Integer start, @Param("limit") Integer limit,@Param("openId") String openId);
+    List<Activity> queryJoin(@Param("start") Integer start, @Param("limit") Integer limit,@Param("openId") String openId,@Param("type") String type);
 
     /**
      * @param openId 用户
      * @return 条数
      */
-    int queryJoinCount(String openId);
+    int queryJoinCount(@Param("openId") String openId,@Param("type") String type);
+
+    /**
+     * 推荐活动
+     * @param openId
+     * @return
+     */
+    List<Activity> recommend(String openId);
 }

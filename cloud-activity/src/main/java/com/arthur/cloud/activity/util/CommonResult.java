@@ -1,11 +1,14 @@
 package com.arthur.cloud.activity.util;
 
+import io.swagger.annotations.ApiModel;
+
 /**
  * 封装返回数据
  *
  * @author arthur
  * @date
  */
+@ApiModel
 public class CommonResult {
 
     private boolean hasError = false;

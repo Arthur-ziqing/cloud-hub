@@ -19,4 +19,9 @@ public class UJoinAService extends BaseService<UJoinA> {
     @Resource
     private UJoinAMapper uJoinAMapper;
 
+
+    public int countJoin(Long activityId) {
+        return uJoinAMapper.countJoin(activityId);
+    }
+
 }
